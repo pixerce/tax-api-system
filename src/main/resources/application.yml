@@ -1,1 +1,3 @@
-spring.application.name=tax-api-system
+spring:
+  application:
+    name: tax-api

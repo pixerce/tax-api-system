@@ -1,4 +1,4 @@
-package com.kcd.vat;
+package com.example.tax;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
