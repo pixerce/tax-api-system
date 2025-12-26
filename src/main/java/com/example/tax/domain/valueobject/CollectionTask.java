@@ -20,4 +20,26 @@ public class CollectionTask {
     private LocalDateTime updatedAt;
     private String errorMessage;
 
+    public static CollectionTask create(StoreId storeId, YearMonth targetYearMonth) {
+        return CollectionTask.builder()
+                .storeId(storeId)
+                .targetYearMonth(targetYearMonth)
+                .status(TaskStatus.NOT_REQUESTED)
+                .build();
+    }
+
+    public void started() {
+        this.startedAt = LocalDateTime.now();
+        this.status = TaskStatus.COLLECTING;
+    }
+
+    public void finished() {
+        this.updatedAt = LocalDateTime.now();
+        this.status = TaskStatus.COLLECTED;
+    }
+
+    public void failed() {
+        this.updatedAt = LocalDateTime.now();
+        this.status = TaskStatus.FAILED;
+    }
 }

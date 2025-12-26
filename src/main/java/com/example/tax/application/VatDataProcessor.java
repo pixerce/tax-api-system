@@ -1,13 +1,9 @@
 package com.example.tax.application;
 
 import com.example.tax.application.dto.DataCollectionResponse;
-import com.example.tax.application.port.out.DataSourceReaderPort;
-import com.example.tax.application.port.out.TransactionRecordPort;
 import com.example.tax.application.service.DataCollectionProcessor;
-import com.example.tax.application.service.ExcelDataCollectionProcessor;
-import com.example.tax.application.service.TaskMonitor;
+import com.example.tax.application.service.DataCollectionProcessorFactory;
 import com.example.tax.domain.valueobject.StoreId;
-import com.example.tax.domain.valueobject.TaskStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -21,35 +17,25 @@ import java.util.concurrent.Executor;
 public class VatDataProcessor {
 
     public VatDataProcessor(@Qualifier("collection-executor") Executor executorService
-            , DataSourceReaderPort dataSourceReaderPort, TransactionRecordPort transactionRecordPort
-            , TaskMonitor taskMonitor) {
+            , DataCollectionProcessorFactory dataCollectionProcessorFactory) {
         this.executorService = executorService;
-        this.dataSourceReaderPort = dataSourceReaderPort;
-        this.transactionRecordPort = transactionRecordPort;
-        this.taskMonitor = taskMonitor;
+        this.dataCollectionProcessorFactory = dataCollectionProcessorFactory;
     }
 
     private final Executor executorService;
-    private final DataSourceReaderPort dataSourceReaderPort;
-    private final TransactionRecordPort transactionRecordPort;
-    private final TaskMonitor taskMonitor;
+    private final DataCollectionProcessorFactory dataCollectionProcessorFactory;
 
     public DataCollectionResponse collectDataAndCalculateVat(final StoreId storeId, final YearMonth targetYearMonth) {
 
-        taskMonitor.updateStatus(storeId, TaskStatus.COLLECTING);
-
-        final DataCollectionProcessor dataCollectionProcessor = ExcelDataCollectionProcessor.builder()
-                .dataSourceReaderPort(dataSourceReaderPort)
-                .transactionRecordPort(transactionRecordPort)
-                .storeId(storeId)
-                .build();
+        final DataCollectionProcessor dataCollectionProcessor = this.dataCollectionProcessorFactory.createDataCollectorTask(storeId, targetYearMonth);
+        dataCollectionProcessor.started();
 
         CompletableFuture.supplyAsync(dataCollectionProcessor::process, executorService)
                 .thenRun(() -> {
-                    taskMonitor.updateStatus(storeId, TaskStatus.COLLECTED);
+                    dataCollectionProcessor.finished();
                 })
                 .exceptionally(ex -> {
-                    taskMonitor.updateStatus(storeId, TaskStatus.FAILED);
+                    dataCollectionProcessor.failed();
                     return null;
                 });
 

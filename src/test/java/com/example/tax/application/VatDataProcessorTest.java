@@ -2,15 +2,13 @@ package com.example.tax.application;
 
 import com.example.tax.application.port.out.DataSourceReaderPort;
 import com.example.tax.application.port.out.TransactionRecordPort;
-import com.example.tax.application.service.DataCollectionProcessor;
-import com.example.tax.application.service.ExcelDataCollectionProcessor;
-import com.example.tax.application.service.TaskMonitor;
+import com.example.tax.application.service.*;
 import com.example.tax.domain.valueobject.StoreId;
-import com.example.tax.domain.valueobject.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -34,13 +32,15 @@ class VatDataProcessorTest {
     @Mock
     private TransactionRecordPort transactionRecordPort;
     @Mock
-    private TaskMonitor taskMonitor;
+    private DataCollectionProcessorFactory dataCollectionProcessorFactory;
+    @Mock
+    private CollectionTaskHandler collectionTaskHandler;
 
     private final Executor executorService = Executors.newFixedThreadPool(1);
 
     @BeforeEach
     void setUp() {
-        vatDataProcessor = new VatDataProcessor(executorService, dataSourceReaderPort, transactionRecordPort, taskMonitor);
+        vatDataProcessor = new VatDataProcessor(executorService, dataCollectionProcessorFactory);
     }
 
     @Test
@@ -49,15 +49,23 @@ class VatDataProcessorTest {
         var storeId = StoreId.of("1234567890");
         var targetMonth = YearMonth.now();
 
+        DataCollectionProcessor task = new ExecutionTimeGuarantorDecorator(ExcelDataCollectionProcessor.builder()
+                .dataSourceReaderPort(dataSourceReaderPort)
+                .transactionRecordPort(transactionRecordPort)
+                .storeId(storeId)
+                .collectionTaskHandler(collectionTaskHandler)
+                .build(), 1000L);
+
+        BDDMockito.given(dataCollectionProcessorFactory.createDataCollectorTask(any(), any())).willReturn(task);
         vatDataProcessor.collectDataAndCalculateVat(storeId, targetMonth);
 
         await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
-            verify(taskMonitor).updateStatus(storeId, TaskStatus.COLLECTING);
+            verify(collectionTaskHandler).start();
 
             verify(dataSourceReaderPort).readData(eq(storeId), any());
             verify(transactionRecordPort).flush();
 
-            verify(taskMonitor).updateStatus(storeId, TaskStatus.COLLECTED);
+            verify(collectionTaskHandler).finish();
         });
     }
 
@@ -69,21 +77,22 @@ class VatDataProcessorTest {
         doThrow(new RuntimeException("파일 읽기 실패"))
                 .when(dataSourceReaderPort).readData(any(), any());
 
-        DataCollectionProcessor task = ExcelDataCollectionProcessor.builder()
+        DataCollectionProcessor task = new ExecutionTimeGuarantorDecorator(ExcelDataCollectionProcessor.builder()
                 .dataSourceReaderPort(dataSourceReaderPort)
                 .transactionRecordPort(transactionRecordPort)
                 .storeId(storeId)
-                .build();
+                .collectionTaskHandler(collectionTaskHandler)
+                .build(), 1000L);
+
+        BDDMockito.given(dataCollectionProcessorFactory.createDataCollectorTask(any(), any())).willReturn(task);
 
         vatDataProcessor.collectDataAndCalculateVat(storeId, YearMonth.now());
 
         await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
-            verify(taskMonitor).updateStatus(storeId, TaskStatus.COLLECTING);
-            verify(taskMonitor).updateStatus(storeId, TaskStatus.FAILED);
+            verify(collectionTaskHandler).start();
+            verify(collectionTaskHandler).fail();
 
-            verify(taskMonitor, never()).updateStatus(storeId, TaskStatus.COLLECTED);
+            verify(collectionTaskHandler, never()).finish();
         });
     }
-
-
 }

@@ -10,6 +10,7 @@ public class ExcelDataCollectionProcessor implements DataCollectionProcessor {
     private final DataSourceReaderPort dataSourceReaderPort;
     private final TransactionRecordPort transactionRecordPort;
     private final StoreId storeId;
+    private final CollectionTaskHandler collectionTaskHandler;
 
     public StoreId process() {
         dataSourceReaderPort.readData(storeId, transactionRecordPort::saveAll);
@@ -17,4 +18,18 @@ public class ExcelDataCollectionProcessor implements DataCollectionProcessor {
         return storeId;
     }
 
+    @Override
+    public void started() {
+        collectionTaskHandler.start();
+    }
+
+    @Override
+    public void finished() {
+        this.collectionTaskHandler.finish();
+    }
+
+    @Override
+    public void failed() {
+        this.collectionTaskHandler.fail();
+    }
 }

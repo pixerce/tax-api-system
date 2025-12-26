@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface CollectionTaskPort {
 
     Optional<CollectionTask> findLastestTaskByStoreId(StoreId storeId, YearMonth targetYearMonth);
+
+    void save(CollectionTask collectionTask);
 }
