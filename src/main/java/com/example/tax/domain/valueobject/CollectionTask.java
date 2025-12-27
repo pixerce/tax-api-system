@@ -20,6 +20,14 @@ public class CollectionTask {
     private LocalDateTime updatedAt;
     private String errorMessage;
 
+    public void assignId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
     public static CollectionTask create(StoreId storeId, YearMonth targetYearMonth) {
         return CollectionTask.builder()
                 .storeId(storeId)
