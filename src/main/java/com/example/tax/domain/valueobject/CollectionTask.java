@@ -38,8 +38,9 @@ public class CollectionTask {
         this.status = TaskStatus.COLLECTED;
     }
 
-    public void failed() {
+    public void failed(final String errorMessage) {
         this.updatedAt = LocalDateTime.now();
         this.status = TaskStatus.FAILED;
+        this.errorMessage = errorMessage;
     }
 }

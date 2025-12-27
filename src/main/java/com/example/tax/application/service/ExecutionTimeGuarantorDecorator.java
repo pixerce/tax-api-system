@@ -27,19 +27,4 @@ public class ExecutionTimeGuarantorDecorator implements DataCollectionProcessor 
         }
         return result;
     }
-
-    @Override
-    public void started() {
-        delegate.started();
-    }
-
-    @Override
-    public void finished() {
-        delegate.finished();
-    }
-
-    @Override
-    public void failed() {
-        delegate.failed();
-    }
 }
