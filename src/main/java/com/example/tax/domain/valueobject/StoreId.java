@@ -1,13 +1,19 @@
 package com.example.tax.domain.valueobject;
 
-import jakarta.persistence.Embeddable;
+import lombok.Getter;
 
-@Embeddable
-public record StoreId(String value) {
-    public static StoreId of(String value) {
+@Getter
+public class StoreId {
+    private final String id;
+
+    public static StoreId of(final String value) {
         if (value == null || value.length() < 10) {
             throw new IllegalArgumentException("사업자 번호는 숫자 10자리여야 합니다.");
         }
         return new StoreId(value);
+    }
+
+    private StoreId(final String value) {
+        this.id = value;
     }
 }

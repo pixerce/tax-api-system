@@ -9,7 +9,7 @@ public class DataCollectionMapper {
 
     public DataCollectionResponse toDataCollectionResponse(final CollectionTask collectionTask) {
         return DataCollectionResponse.builder()
-                .storeId(collectionTask.getStoreId().value())
+                .storeId(collectionTask.getStoreId().getId())
                 .status(collectionTask.getStatus())
                 .startedAt(collectionTask.getStartedAt())
                 .endedAt(collectionTask.getUpdatedAt())

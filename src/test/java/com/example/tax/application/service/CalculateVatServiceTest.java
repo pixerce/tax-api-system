@@ -31,7 +31,7 @@ class CalculateVatServiceTest {
     @Test
     @DisplayName("상점 ID와 년월이 주어지면 매출/매입을 합산하고 부가세를 계산하여 저장한다")
     void calculateAndStore_success() {
-        StoreId storeId = new StoreId("0123456789");
+        StoreId storeId = StoreId.of("0123456789");
         YearMonth targetYearMonth = YearMonth.of(2025, 12);
 
         CalculateVatUseCase calculateVatUseCase = new CalculateVatService(transactionRecordPort, storeVatPort, new VatRateSourceAdapter());

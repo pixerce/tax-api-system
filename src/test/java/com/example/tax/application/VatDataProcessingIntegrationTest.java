@@ -47,7 +47,7 @@ public class VatDataProcessingIntegrationTest {
     @MockitoBean
     private CollectionTaskPort collectionTaskPort;
 
-    private final StoreId storeId = new StoreId("0123456789");
+    private final StoreId storeId = StoreId.of("0123456789");
     private final YearMonth targetMonth = YearMonth.now();
 
     /**

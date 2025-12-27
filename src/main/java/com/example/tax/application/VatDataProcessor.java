@@ -46,6 +46,6 @@ public class VatDataProcessor {
                     return null;
                 });
 
-        return DataCollectionResponse.createCollectingResponse(storeId.value());
+        return DataCollectionResponse.createCollectingResponse(storeId.getId());
     }
 }

@@ -2,6 +2,7 @@ package com.example.tax.adapter.out.persistence.mapper;
 
 import com.example.tax.adapter.out.persistence.entity.CollectionTaskEntity;
 import com.example.tax.domain.valueobject.CollectionTask;
+import com.example.tax.domain.valueobject.StoreId;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +14,7 @@ public class CollectionTaskMapper {
                 .updatedAt(collectionTaskEntity.getEndedAt())
                 .status(collectionTaskEntity.getStatus())
                 .startedAt(collectionTaskEntity.getStartedAt())
-                .storeId(collectionTaskEntity.getStoreId())
+                .storeId(StoreId.of(collectionTaskEntity.getStoreId()))
                 .build();
     }
 
@@ -23,7 +24,7 @@ public class CollectionTaskMapper {
                 .status(collectionTask.getStatus())
                 .errorMessage(collectionTask.getErrorMessage())
                 .startedAt(collectionTask.getStartedAt())
-                .storeId(collectionTask.getStoreId())
+                .storeId(collectionTask.getStoreId().getId())
                 .id(collectionTask.getId())
                 .build();
     }

@@ -75,6 +75,6 @@ class VatCollectionCoordinatorTest {
         vatCollectionCoordinator.getOrInitiateCollection(request);
 
         verify(vatDataProcessor, times(1))
-                .collectDataAndCalculateVat(argThat(id -> id.value().equals(storeId)), eq(targetMonth));
+                .collectDataAndCalculateVat(argThat(id -> id.getId().equals(storeId)), eq(targetMonth));
     }
 }

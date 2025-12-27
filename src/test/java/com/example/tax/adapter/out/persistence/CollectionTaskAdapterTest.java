@@ -29,7 +29,7 @@ class CollectionTaskAdapterTest {
     @Autowired
     private CollectionTaskRepository collectionTaskRepository;
 
-    private final StoreId storeId = new StoreId("0123456789");
+    private final StoreId storeId = StoreId.of("0123456789");
     private final YearMonth targetMonth = YearMonth.of(2025, 12);
 
     @Test
@@ -43,7 +43,7 @@ class CollectionTaskAdapterTest {
         assertThat(collectionTask.getId()).isNotNull();
 
         CollectionTaskEntity savedEntity = collectionTaskRepository.findById(collectionTask.getId()).orElseThrow();
-        assertThat(savedEntity.getStoreId()).isEqualTo(storeId);
+        assertThat(savedEntity.getStoreId()).isEqualTo(storeId.getId());
         assertThat(savedEntity.getStatus()).isEqualTo(TaskStatus.COLLECTING);
     }
 
@@ -57,7 +57,7 @@ class CollectionTaskAdapterTest {
         saveEntity(earlier);
         saveEntity(later);
 
-        Optional<CollectionTask> result = collectionTaskAdapter.findLastestTaskByStoreId(storeId, targetMonth);
+        Optional<CollectionTask> result = collectionTaskAdapter.findLastestTaskByStoreId(storeId.getId(), targetMonth);
 
         assertThat(result).isPresent();
         assertThat(result.get().getStartedAt()).isEqualTo(later);
@@ -65,7 +65,7 @@ class CollectionTaskAdapterTest {
 
     private void saveEntity(LocalDateTime startedAt) {
         collectionTaskRepository.save(CollectionTaskEntity.builder()
-                .storeId(storeId)
+                .storeId(storeId.getId())
                 .targetYearMonth(targetMonth)
                 .status(TaskStatus.COLLECTING)
                 .startedAt(startedAt)

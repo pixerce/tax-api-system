@@ -5,7 +5,6 @@ import com.example.tax.adapter.out.persistence.mapper.CollectionTaskMapper;
 import com.example.tax.adapter.out.persistence.repository.CollectionTaskRepository;
 import com.example.tax.application.port.out.CollectionTaskPort;
 import com.example.tax.domain.valueobject.CollectionTask;
-import com.example.tax.domain.valueobject.StoreId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ public class CollectionTaskAdapter implements CollectionTaskPort {
     }
 
     @Override
-    public Optional<CollectionTask> findLastestTaskByStoreId(final StoreId storeId, final YearMonth targetYearMonth) {
+    public Optional<CollectionTask> findLastestTaskByStoreId(final String storeId, final YearMonth targetYearMonth) {
         Optional<CollectionTaskEntity> collectionTaskEntityOptional = this.collectionTaskRepository
                 .findFirstByStoreIdAndTargetYearMonthOrderByStartedAtDesc(storeId, targetYearMonth);
 

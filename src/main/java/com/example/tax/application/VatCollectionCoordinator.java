@@ -23,7 +23,7 @@ public class VatCollectionCoordinator {
 
         final StoreId storeId = StoreId.of(dataCollectionRequest.getStoreId());
         Optional<CollectionTask> collectionTaskOptional
-                = collectionTaskPort.findLastestTaskByStoreId(storeId, dataCollectionRequest.getTargetYearMonth());
+                = collectionTaskPort.findLastestTaskByStoreId(storeId.getId(), dataCollectionRequest.getTargetYearMonth());
 
         if (collectionTaskOptional.isPresent()) {
             CollectionTask collectionTask = collectionTaskOptional.get();
