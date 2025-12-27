@@ -2,9 +2,12 @@ package com.example.tax.application;
 
 import com.example.tax.application.dto.DataCollectionRequest;
 import com.example.tax.application.dto.DataCollectionResponse;
+import com.example.tax.application.dto.VatResultResponse;
 import com.example.tax.application.mapper.DataCollectionMapper;
 import com.example.tax.application.port.out.CollectionTaskPort;
+import com.example.tax.application.port.out.StoreVatPort;
 import com.example.tax.domain.valueobject.StoreId;
+import com.example.tax.domain.valueobject.StoreVat;
 import com.example.tax.domain.valueobject.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,6 +21,18 @@ public class VatCollectionCoordinator {
     private final DataCollectionMapper dataCollectionMapper;
     private final VatDataProcessor vatDataProcessor;
     private final CollectionTaskPort collectionTaskPort;
+    private final StoreVatPort storeVatPort;
+
+    public VatResultResponse getVat(final String storeIdStr,  final YearMonth yearMonth) {
+        final StoreId storeId = StoreId.of(storeIdStr);
+
+        final StoreVat storeVat = storeVatPort.findByStoreIdAndYearMonth(storeId, yearMonth);
+        return VatResultResponse.builder()
+                .vat(storeVat.getVat().getAmount().longValue())
+                .storeId(storeVat.getStoreId())
+                .yearMonth(storeVat.getTargetYearMonth())
+                .build();
+    }
 
     public DataCollectionResponse getState(final String storeIdStr,  final YearMonth yearMonth) {
         final StoreId storeId = StoreId.of(storeIdStr);

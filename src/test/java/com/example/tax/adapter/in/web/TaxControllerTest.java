@@ -2,6 +2,7 @@ package com.example.tax.adapter.in.web;
 
 import com.example.tax.application.VatCollectionCoordinator;
 import com.example.tax.application.dto.DataCollectionResponse;
+import com.example.tax.application.dto.VatResultResponse;
 import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.TaskStatus;
 import org.junit.jupiter.api.DisplayName;
@@ -56,6 +57,33 @@ class TaxControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.storeId").value(storeIdStr))
                 .andExpect(jsonPath("$.status").value("COLLECTED"))
+                .andExpect(jsonPath("$.yearMonth").value("2025-12"))
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("상점의 부가세 결과 조회 테스트 - 형식 및 값 검증")
+    void testGetVat() throws Exception {
+        String storeIdStr = "0123456789";
+        YearMonth targetMonth = YearMonth.of(2025, 12);
+        Long expectedVat = 1500000L;
+
+        VatResultResponse mockResponse = VatResultResponse.builder()
+                .vat(expectedVat)
+                .storeId(StoreId.of(storeIdStr))
+                .yearMonth(targetMonth)
+                .build();
+
+        given(vatCollectionCoordinator.getVat(storeIdStr, targetMonth))
+                .willReturn(mockResponse);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tax/{storeId}/vat", storeIdStr)
+                        .param("yearMonth", "2025-12")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.vat").value(expectedVat))
+                .andExpect(jsonPath("$.storeId").value(storeIdStr))
                 .andExpect(jsonPath("$.yearMonth").value("2025-12"))
                 .andDo(print());
     }
