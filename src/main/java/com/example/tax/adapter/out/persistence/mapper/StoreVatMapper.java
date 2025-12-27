@@ -28,7 +28,7 @@ public class StoreVatMapper {
                 .sales(new Money(BigDecimal.valueOf(storeVatEntity.getSales())))
                 .purchase(new Money(BigDecimal.valueOf(storeVatEntity.getPurchase())))
                 .targetYearMonth(storeVatEntity.getTargetYearMonth())
-                .id(storeVatEntity.getId())
+                .id(storeVatEntity.getSrl())
                 .build();
     }
 }

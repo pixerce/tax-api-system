@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class CollectionTaskMapper {
     public CollectionTask toDomain(CollectionTaskEntity collectionTaskEntity) {
         return CollectionTask.builder()
-                .id(collectionTaskEntity.getId())
+                .id(collectionTaskEntity.getSrl())
                 .errorMessage(collectionTaskEntity.getErrorMessage())
                 .updatedAt(collectionTaskEntity.getEndedAt())
                 .status(collectionTaskEntity.getStatus())

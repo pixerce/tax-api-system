@@ -46,7 +46,7 @@ public class TransactionRecordEntity extends AbstractBaseEntity {
     @Override
     public String toString() {
         return "TransactionRecordEntity(" +
-                "id=" + this.getId() +
+                "id=" + this.getSrl() +
                 ", transactionType=" + transactionType +
                 ", amount=" + amount +
                 ", storeId=" + storeId +

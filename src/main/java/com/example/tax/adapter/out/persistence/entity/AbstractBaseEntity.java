@@ -15,14 +15,14 @@ public abstract class AbstractBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    protected Long srl;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         AbstractBaseEntity that = (AbstractBaseEntity) o;
-        return id != null && Objects.equals(id, that.id);
+        return srl != null && Objects.equals(srl, that.srl);
     }
 
     @Override

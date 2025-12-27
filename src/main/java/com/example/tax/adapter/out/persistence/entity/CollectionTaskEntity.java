@@ -39,7 +39,7 @@ public class CollectionTaskEntity extends AbstractBaseEntity {
     @Builder
     private CollectionTaskEntity(Long id, String storeId, TaskStatus status, LocalDateTime startedAt
             , LocalDateTime endedAt, String errorMessage, YearMonth targetYearMonth) {
-        this.id = id;
+        this.srl = id;
         this.storeId = storeId;
         this.status = status;
         this.startedAt = startedAt;

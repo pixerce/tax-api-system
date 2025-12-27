@@ -23,7 +23,7 @@ public class CollectionTaskAdapter implements CollectionTaskPort {
         CollectionTaskEntity collectionTaskEntity = collectionTaskMapper.toEntity(collectionTask);
         CollectionTaskEntity savedEntity = collectionTaskRepository.save(collectionTaskEntity);
         if (collectionTask.getId() == null) {
-            collectionTask.assignId(savedEntity.getId());
+            collectionTask.assignId(savedEntity.getSrl());
         }
     }
 

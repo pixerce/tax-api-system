@@ -41,13 +41,13 @@ public class StoreVatEntity extends AbstractBaseEntity {
     }
 
     public void assignId(final Long id) {
-        this.id = id;
+        this.srl = id;
     }
 
     @Builder
     private StoreVatEntity(final Long id, final StoreEntity store, final Long vat, final Long sales, final Long purchase
             , final LocalDateTime calculatedAt, final YearMonth targetYearMonth) {
-        this.id = id;
+        this.srl = id;
         this.store = store;
         this.vat = vat;
         this.sales = sales;
@@ -59,7 +59,7 @@ public class StoreVatEntity extends AbstractBaseEntity {
     @Override
     public String toString() {
         return "StoreVatEntity{" +
-                "store=" + store.getId() +
+                "store=" + store.getSrl() +
                 ", vat=" + vat +
                 ", sales=" + sales +
                 ", purchase=" + purchase +

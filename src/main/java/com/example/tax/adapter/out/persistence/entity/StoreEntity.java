@@ -17,7 +17,7 @@ public class StoreEntity extends AbstractBaseEntity {
 
     @Builder
     private StoreEntity(final Long id, final String storeId) {
-        this.id = id;
+        this.srl = id;
         this.storeId = storeId;
     }
 }

@@ -36,7 +36,7 @@ public class StoreVatAdapter implements StoreVatPort {
 
         storeVatEntity.assignStore(storeEntity);
 
-        storeVatEntityOptional.ifPresent(entity -> storeVatEntity.assignId(entity.getId()));
+        storeVatEntityOptional.ifPresent(entity -> storeVatEntity.assignId(entity.getSrl()));
 
         this.storeVatRepository.save(storeVatEntity);
     }
