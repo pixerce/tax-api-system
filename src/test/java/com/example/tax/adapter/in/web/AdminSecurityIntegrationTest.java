@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WithMockUser
 @SpringBootTest
 @AutoConfigureMockMvc
 class AdminSecurityIntegrationTest {
@@ -63,7 +65,7 @@ class AdminSecurityIntegrationTest {
         given(userStorePort.existsByUserSrlAndStoreId(anyLong(), any())).willReturn(false);
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/admins/roles")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/admins/1/roles")
                         .param("storeId", "0123456789")
                         .header("X-Admin-Role", "MANAGER")
                         .header("X-Admin-Id", "admin-01"))
