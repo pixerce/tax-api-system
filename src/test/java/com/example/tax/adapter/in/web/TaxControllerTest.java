@@ -50,7 +50,6 @@ class TaxControllerTest {
         given(vatCollectionCoordinator.getState(storeIdStr, targetMonth))
                 .willReturn(mockResponse);
 
-        // When & Then
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tax/{storeId}/state", storeIdStr)
                         .param("yearMonth", "2025-12") // 쿼리 파라미터 전달
                         .contentType(MediaType.APPLICATION_JSON))
