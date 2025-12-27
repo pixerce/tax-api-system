@@ -1,5 +1,6 @@
 package com.example.tax.adapter.in.event;
 
+import com.example.tax.application.port.in.CalculateVatUseCase;
 import com.example.tax.application.port.out.CollectionTaskPort;
 import com.example.tax.domain.event.DataProcessingCompletedEvent;
 import com.example.tax.domain.event.DataProcessingFailedEvent;
@@ -20,6 +21,7 @@ import java.time.YearMonth;
 public class DataProcessingEventAdapter {
 
     private final CollectionTaskPort collectionTaskPort;
+    private final CalculateVatUseCase calculateVatUseCase;
 
     @Async
     @EventListener
@@ -46,6 +48,7 @@ public class DataProcessingEventAdapter {
     @Async
     @EventListener
     public void handleCompletedEventAndCalculate(final DataProcessingCompletedEvent event) {
+        calculateVatUseCase.calculateAndStore(event.getStoreId(), event.getTargetYearMonth());
     }
 
     @Async
