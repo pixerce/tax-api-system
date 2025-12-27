@@ -5,6 +5,7 @@ import com.example.tax.application.dto.DataCollectionResponse;
 import com.example.tax.application.mapper.DataCollectionMapper;
 import com.example.tax.application.port.out.CollectionTaskPort;
 import com.example.tax.domain.valueobject.CollectionTask;
+import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.TaskStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ class VatCollectionCoordinatorTest {
     void validationTest() {
         var request = new DataCollectionRequest("123", YearMonth.now());
 
-        assertThatThrownBy(() -> vatCollectionCoordinator.getOrInitiateCollection(request))
+        assertThatThrownBy(() -> vatCollectionCoordinator.requestDataProcess(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("사업자 번호는 숫자 10자리여야 합니다.");
     }
@@ -54,10 +55,10 @@ class VatCollectionCoordinatorTest {
 
         given(collectionTaskPort.findLastestTaskByStoreId(any(), any())).willReturn(Optional.of(existingTask));
 
-        var mockResponse = DataCollectionResponse.createCollectingResponse(storeId);
+        var mockResponse = DataCollectionResponse.createCollectingResponse(StoreId.of(storeId), YearMonth.now());
         given(dataCollectionMapper.toDataCollectionResponse(existingTask)).willReturn(mockResponse);
 
-        var response = vatCollectionCoordinator.getOrInitiateCollection(request);
+        var response = vatCollectionCoordinator.requestDataProcess(request);
 
         assertThat(response.getStatus()).isIn(Set.of(TaskStatus.COLLECTING, TaskStatus.COLLECTED, TaskStatus.FAILED));
         verifyNoInteractions(vatDataProcessor);
@@ -72,7 +73,7 @@ class VatCollectionCoordinatorTest {
 
         given(collectionTaskPort.findLastestTaskByStoreId(any(), any())).willReturn(Optional.empty());
 
-        vatCollectionCoordinator.getOrInitiateCollection(request);
+        vatCollectionCoordinator.requestDataProcess(request);
 
         verify(vatDataProcessor, times(1))
                 .collectDataAndCalculateVat(argThat(id -> id.getId().equals(storeId)), eq(targetMonth));

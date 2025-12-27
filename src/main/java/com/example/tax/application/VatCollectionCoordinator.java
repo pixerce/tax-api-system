@@ -4,12 +4,12 @@ import com.example.tax.application.dto.DataCollectionRequest;
 import com.example.tax.application.dto.DataCollectionResponse;
 import com.example.tax.application.mapper.DataCollectionMapper;
 import com.example.tax.application.port.out.CollectionTaskPort;
-import com.example.tax.domain.valueobject.CollectionTask;
 import com.example.tax.domain.valueobject.StoreId;
+import com.example.tax.domain.valueobject.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.time.YearMonth;
 
 @Component
 @RequiredArgsConstructor
@@ -19,18 +19,29 @@ public class VatCollectionCoordinator {
     private final VatDataProcessor vatDataProcessor;
     private final CollectionTaskPort collectionTaskPort;
 
-    public DataCollectionResponse getOrInitiateCollection(final DataCollectionRequest dataCollectionRequest) {
-
-        final StoreId storeId = StoreId.of(dataCollectionRequest.getStoreId());
-        Optional<CollectionTask> collectionTaskOptional
-                = collectionTaskPort.findLastestTaskByStoreId(storeId.getId(), dataCollectionRequest.getTargetYearMonth());
-
-        if (collectionTaskOptional.isPresent()) {
-            CollectionTask collectionTask = collectionTaskOptional.get();
-            return dataCollectionMapper.toDataCollectionResponse(collectionTask);
-        }
-
-        return vatDataProcessor
-                .collectDataAndCalculateVat(storeId, dataCollectionRequest.getTargetYearMonth());
+    public DataCollectionResponse getState(final String storeIdStr,  final YearMonth yearMonth) {
+        final StoreId storeId = StoreId.of(storeIdStr);
+        return collectionTaskPort.findLastestTaskByStoreId(storeId.getId(), yearMonth)
+                .map(dataCollectionMapper::toDataCollectionResponse)
+                .orElseGet(() -> buildNotRequestedResponse(storeId, yearMonth));
     }
+
+    private DataCollectionResponse buildNotRequestedResponse(final StoreId storeId,  final YearMonth yearMonth) {
+        return DataCollectionResponse.builder()
+                .status(TaskStatus.NOT_REQUESTED)
+                .storeId(storeId)
+                .yearMonth(yearMonth)
+                .build();
+    }
+
+    public DataCollectionResponse requestDataProcess(final DataCollectionRequest dataCollectionRequest) {
+        return collectionTaskPort.findLastestTaskByStoreId(
+                        dataCollectionRequest.getStoreId(),
+                        dataCollectionRequest.getTargetYearMonth())
+                .map(dataCollectionMapper::toDataCollectionResponse)
+                .orElseGet(() -> vatDataProcessor.collectDataAndCalculateVat(
+                        StoreId.of(dataCollectionRequest.getStoreId()),dataCollectionRequest.getTargetYearMonth()));
+    }
+
+
 }
