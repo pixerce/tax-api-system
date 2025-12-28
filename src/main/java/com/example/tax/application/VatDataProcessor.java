@@ -38,6 +38,7 @@ public class VatDataProcessor {
 
         CompletableFuture.supplyAsync(dataCollectionProcessor::process, executorService)
                 .thenRun(() -> {
+                    dataCollectionProcessor.done();
                     eventPublisher.publishEvent(new DataProcessingCompletedEvent(storeId, targetYearMonth));
                 })
                 .exceptionally(ex -> {

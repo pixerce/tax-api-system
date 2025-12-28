@@ -16,4 +16,8 @@ public class ExcelDataCollectionProcessor implements DataCollectionProcessor {
         transactionRecordPort.flush();
         return storeId;
     }
+
+    @Override
+    public void done() {
+    }
 }
