@@ -25,7 +25,8 @@ public class CollectionTaskMapper {
                 .errorMessage(collectionTask.getErrorMessage())
                 .startedAt(collectionTask.getStartedAt())
                 .storeId(collectionTask.getStoreId().getId())
-                .id(collectionTask.getId())
+                .srl(collectionTask.getId())
+                .targetYearMonth(collectionTask.getTargetYearMonth())
                 .build();
     }
 

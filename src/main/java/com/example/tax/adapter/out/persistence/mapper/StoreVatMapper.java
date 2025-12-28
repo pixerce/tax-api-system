@@ -18,6 +18,7 @@ public class StoreVatMapper {
                 .purchase(storeVat.getPurchase().getAmount().longValue())
                 .vat(storeVat.getVat().getAmount().longValue())
                 .id(storeVat.getId())
+                .calculatedAt(storeVat.getCalculatedAt())
                 .build();
     }
 

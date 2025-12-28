@@ -7,6 +7,7 @@ import com.example.tax.application.port.out.CollectionTaskPort;
 import com.example.tax.domain.valueobject.CollectionTask;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.YearMonth;
 import java.util.Optional;
@@ -18,8 +19,18 @@ public class CollectionTaskAdapter implements CollectionTaskPort {
     private final CollectionTaskRepository collectionTaskRepository;
     private final CollectionTaskMapper collectionTaskMapper;
 
+    @Transactional
     @Override
-    public void save(CollectionTask collectionTask) {
+    public void save(final CollectionTask collectionTask) {
+        Optional<CollectionTaskEntity> collectionTaskEntityOptional
+                = collectionTaskRepository.findFirstByStoreIdAndTargetYearMonthOrderByStartedAtDesc(
+                        collectionTask.getStoreId().getId(), collectionTask.getTargetYearMonth());
+
+        if (collectionTaskEntityOptional.isPresent()) {
+            CollectionTaskEntity savedCollectionTaskEntity = collectionTaskEntityOptional.get();
+            collectionTask.assignId(savedCollectionTaskEntity.getSrl());
+        }
+
         CollectionTaskEntity collectionTaskEntity = collectionTaskMapper.toEntity(collectionTask);
         CollectionTaskEntity savedEntity = collectionTaskRepository.save(collectionTaskEntity);
         if (collectionTask.getId() == null) {

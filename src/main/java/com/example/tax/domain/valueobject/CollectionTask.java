@@ -37,17 +37,14 @@ public class CollectionTask {
     }
 
     public void started() {
-        this.startedAt = LocalDateTime.now();
         this.status = TaskStatus.COLLECTING;
     }
 
     public void finished() {
-        this.updatedAt = LocalDateTime.now();
         this.status = TaskStatus.COLLECTED;
     }
 
     public void failed(final String errorMessage) {
-        this.updatedAt = LocalDateTime.now();
         this.status = TaskStatus.FAILED;
         this.errorMessage = errorMessage;
     }

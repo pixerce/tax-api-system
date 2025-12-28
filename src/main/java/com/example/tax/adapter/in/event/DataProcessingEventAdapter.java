@@ -29,6 +29,7 @@ public class DataProcessingEventAdapter {
         final StoreId storeId = event.getStoreId();
         final YearMonth targetYearMonth = event.getTargetYearMonth();
 
+        log.info("data processing started, storedId={}, targetYearMonth={}", storeId, targetYearMonth);
         final CollectionTask collectionTask = CollectionTask.create(storeId, targetYearMonth);
         collectionTask.started();
         this.collectionTaskPort.save(collectionTask);
@@ -40,6 +41,7 @@ public class DataProcessingEventAdapter {
         final StoreId storeId = event.getStoreId();
         final YearMonth targetYearMonth = event.getTargetYearMonth();
 
+        log.info("data processing completed, storedId={}, targetYearMonth={}", storeId, targetYearMonth);
         final CollectionTask collectionTask = CollectionTask.create(storeId, targetYearMonth);
         collectionTask.finished();
         this.collectionTaskPort.save(collectionTask);
@@ -48,6 +50,7 @@ public class DataProcessingEventAdapter {
     @Async
     @EventListener
     public void handleCompletedEventAndCalculate(final DataProcessingCompletedEvent event) {
+        log.info("calculate vat, storedId={}, targetYearMonth={}", event.getStoreId(), event.getTargetYearMonth());
         calculateVatUseCase.calculateAndStore(event.getStoreId(), event.getTargetYearMonth());
     }
 
@@ -57,6 +60,7 @@ public class DataProcessingEventAdapter {
         final StoreId storeId = event.getStoreId();
         final YearMonth targetYearMonth = event.getTargetYearMonth();
 
+        log.info("data processing failed, storedId={}, targetYearMonth={}", storeId, targetYearMonth);
         final CollectionTask collectionTask = CollectionTask.create(storeId, targetYearMonth);
         collectionTask.failed(event.getErrorMessage());
         this.collectionTaskPort.save(collectionTask);

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 
 @Builder
@@ -22,6 +23,8 @@ public class StoreVat {
 
     private VatRate vatRate;
 
+    private LocalDateTime calculatedAt;
+
     public void assignId(Long id) {
         this.id = id;
     }
@@ -29,6 +32,7 @@ public class StoreVat {
     public void calculateVat() {
         Money profit = this.sales.subtract(this.purchase);
         this.vat = profit.multiply(vatRate.getRate()).scale();
+        calculatedAt = LocalDateTime.now();
     }
 
 }

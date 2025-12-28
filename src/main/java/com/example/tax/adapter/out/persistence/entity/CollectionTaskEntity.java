@@ -6,10 +6,14 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Getter
 @NoArgsConstructor
@@ -27,9 +31,11 @@ public class CollectionTaskEntity extends AbstractBaseEntity {
     @Column(name="status")
     private TaskStatus status;
 
-    @Column(name="started_at")
+    @CreatedDate
+    @Column(name="started_at", updatable = false)
     private LocalDateTime startedAt;
 
+    @LastModifiedDate
     @Column(name="ended_at")
     private LocalDateTime endedAt;
 
@@ -37,13 +43,11 @@ public class CollectionTaskEntity extends AbstractBaseEntity {
     private String errorMessage;
 
     @Builder
-    private CollectionTaskEntity(Long id, String storeId, TaskStatus status, LocalDateTime startedAt
+    private CollectionTaskEntity(Long srl, String storeId, TaskStatus status, LocalDateTime startedAt
             , LocalDateTime endedAt, String errorMessage, YearMonth targetYearMonth) {
-        this.srl = id;
+        this.srl = srl;
         this.storeId = storeId;
         this.status = status;
-        this.startedAt = startedAt;
-        this.endedAt = endedAt;
         this.errorMessage = errorMessage;
         this.targetYearMonth = targetYearMonth;
     }
