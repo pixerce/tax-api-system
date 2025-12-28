@@ -14,6 +14,6 @@ public class UserPersistenceAdapter implements UserPort {
     @Override
     public void checkExistUser(Long userSrl) {
         userRepository.findById(userSrl)
-                .orElseThrow(() -> new InvalidStateException("사용자 정보가 없습니다. userSrl: " + userSrl));
+                .orElseThrow(() -> new InvalidStateException("존재하지 않는 사용자, userSrl: " + userSrl));
     }
 }

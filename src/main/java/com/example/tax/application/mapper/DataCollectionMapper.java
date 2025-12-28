@@ -1,6 +1,6 @@
 package com.example.tax.application.mapper;
 
-import com.example.tax.application.dto.DataCollectionResponse;
+import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
 import com.example.tax.domain.valueobject.CollectionTask;
 import org.springframework.stereotype.Component;
 

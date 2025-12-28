@@ -14,7 +14,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithMockUser
@@ -34,8 +36,9 @@ class AdminSecurityIntegrationTest {
     @Test
     @DisplayName("CheckStoreAccess: ADMIN 권한자는 매니저 할당 여부와 상관없이 조회 가능하다")
     void checkRoles_AdminSuccess() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/admins/1/roles")
-                        .param("storeId", "STORE-01")
+        var storeId = "0123456789";
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/stores/{storeId}/permissions/me", storeId)
+                        .param("userSrl", "123")
                         .header("X-Admin-Role", "ADMIN"))
                 .andExpect(status().isOk());
 
@@ -46,15 +49,13 @@ class AdminSecurityIntegrationTest {
     @Test
     @DisplayName("CheckStoreAccess: MANAGER는 본인에게 할당된 상점인 경우 조회 가능하다")
     void checkRoles_ManagerSuccess() throws Exception {
-        // given
         given(userStorePort.existsByUserSrlAndStoreId(anyLong(), any())).willReturn(true);
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/admins/roles")
-                        .param("storeId", "0123456789")
+        var storeId = "0123456789";
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/stores/{storeId}/permissions/me", storeId)
                         .param("userSrl", "1")
                         .header("X-Admin-Role", "MANAGER")
-                        .header("X-Admin-Id", "admin-01"))
+                )
                 .andExpect(status().isOk());
     }
 
@@ -65,11 +66,12 @@ class AdminSecurityIntegrationTest {
         given(userStorePort.existsByUserSrlAndStoreId(anyLong(), any())).willReturn(false);
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/admins/1/roles")
-                        .param("storeId", "0123456789")
+        var storeId = "0123456789";
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/stores/{storeId}/permissions/me", storeId)
+                        .param("userSrl", "789")
                         .header("X-Admin-Role", "MANAGER")
-                        .header("X-Admin-Id", "admin-01"))
-                .andExpect(status().isForbidden()); // AccessDeniedException 발생 시
+                )
+                .andExpect(status().isForbidden());
     }
 
     // --- StoreAccessManagementController (@AdminOnly) 테스트 ---
@@ -80,16 +82,19 @@ class AdminSecurityIntegrationTest {
         mockMvc.perform(post("/api/v1/stores/1023456789/assignments")
                         .param("userSrl", "1")
                         .header("X-Admin-Role", "MANAGER"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andDo(print());
     }
 
     @Test
     @DisplayName("AdminOnly: ADMIN 권한자는 상점 할당이 가능하다")
     void assignRole_AdminSuccess() throws Exception {
         mockMvc.perform(post("/api/v1/stores/1203456789/assignments")
+                        .with(csrf())
                         .param("userSrl", "1")
                         .header("X-Admin-Role", "ADMIN"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(print());
 
         verify(storeUseCase, times(1)).assignStoreToManager(eq("1203456789"), eq(1L));
     }

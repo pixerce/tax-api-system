@@ -1,4 +1,4 @@
-package com.example.tax.application.dto;
+package com.example.tax.adapter.in.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

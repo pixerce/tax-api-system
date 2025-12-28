@@ -1,12 +1,13 @@
 package com.example.tax.adapter.in.web;
 
+import com.example.tax.adapter.in.web.dto.ApiResponse;
+import com.example.tax.adapter.in.web.dto.DataCollectionRequest;
+import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
+import com.example.tax.adapter.in.web.dto.VatResultResponse;
 import com.example.tax.application.VatCollectionCoordinator;
-import com.example.tax.application.dto.DataCollectionRequest;
-import com.example.tax.application.dto.DataCollectionResponse;
-import com.example.tax.application.dto.VatResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
@@ -17,26 +18,27 @@ import java.time.YearMonth;
 public class TaxController {
 
     private final VatCollectionCoordinator vatCollectionCoordinator;
-    // 수집 요청
+
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping
-    public ResponseEntity<DataCollectionResponse> placeTaxDataProcess(@RequestBody DataCollectionRequest request) {
+    public ApiResponse<DataCollectionResponse> placeTaxDataProcess(@RequestBody DataCollectionRequest request) {
         final DataCollectionResponse response = vatCollectionCoordinator.requestDataProcess(request);
-        return ResponseEntity.ok(response);
+        return ApiResponse.of(response);
     }
 
-    // 수집 상태 조회
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{storeId}/state")
-    public ResponseEntity<DataCollectionResponse> getTaxDataProcessCurrentState(@PathVariable String storeId
+    public ApiResponse<DataCollectionResponse> getTaxDataProcessCurrentState(@PathVariable String storeId
             , @RequestParam(name = "yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
         final DataCollectionResponse response = vatCollectionCoordinator.getState(storeId, yearMonth);
-        return ResponseEntity.ok(response);
+        return ApiResponse.of(response);
     }
 
-    // 부가세 조회
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{storeId}/vat")
-    public ResponseEntity<Object> getVat(@PathVariable String storeId
+    public ApiResponse<Object> getVat(@PathVariable String storeId
             , @RequestParam(name = "yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
         final VatResultResponse response = vatCollectionCoordinator.getVat(storeId, yearMonth);
-        return ResponseEntity.ok(response);
+        return ApiResponse.of(response);
     }
 }

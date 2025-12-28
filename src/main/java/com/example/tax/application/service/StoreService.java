@@ -1,6 +1,7 @@
 package com.example.tax.application.service;
 
-import com.example.tax.application.dto.UserRoleResponse;
+import com.example.tax.adapter.in.web.dto.UserRoleResponse;
+import com.example.tax.adapter.in.web.dto.UserStoreAccessResponse;
 import com.example.tax.application.port.in.StoreUseCase;
 import com.example.tax.application.port.out.StorePort;
 import com.example.tax.application.port.out.UserPort;
@@ -21,7 +22,7 @@ public class StoreService implements StoreUseCase {
     private final UserStorePort userStorePort;
 
     @Override
-    public UserRoleResponse checkRoles(final Long userSrl, final String storeId) {
+    public UserRoleResponse checkPermission(final Long userSrl, final String storeId) {
         userPort.checkExistUser(userSrl);
 
         Boolean result = userStorePort.existsByUserSrlAndStoreId(userSrl, StoreId.of(storeId));
@@ -32,24 +33,26 @@ public class StoreService implements StoreUseCase {
     }
 
     @Override
-    public void assignStoreToManager(String storeIdStr, Long userSrl) {
+    public UserStoreAccessResponse assignStoreToManager(String storeIdStr, Long userSrl) {
         userPort.checkExistUser(userSrl);
 
         final StoreId storeId = StoreId.of(storeIdStr);
         final Optional<Store> storeOptional = storePort.findByStoreId(storeId);
-        if (!storeOptional.isPresent()) {
+        if (storeOptional.isEmpty())
             throw new InvalidStateException("해당 사업장이 존재하지 않습니다.");
-        }
 
-        if (userStorePort.existsByUserSrlAndStoreId(userSrl, storeId)) {
+        if (userStorePort.existsByUserSrlAndStoreId(userSrl, storeId))
             throw new InvalidStateException("이미 권한이 부여된 사업장입니다.");
-        }
 
         userStorePort.saveAccess(userSrl, storeOptional.get().getSrl());
+
+        return new UserStoreAccessResponse(userStorePort.getAccessibleStores(userSrl));
     }
 
+
+
     @Override
-    public void deleteStoreFromManager(String storeIdStr, Long userSrl) {
+    public UserStoreAccessResponse deleteStoreFromManager(String storeIdStr, Long userSrl) {
         userPort.checkExistUser(userSrl);
 
         final StoreId storeId = StoreId.of(storeIdStr);
@@ -63,5 +66,6 @@ public class StoreService implements StoreUseCase {
         }
 
         userStorePort.removeAccess(userSrl, storeId.getId());
+        return new UserStoreAccessResponse(userStorePort.getAccessibleStores(userSrl));
     }
 }

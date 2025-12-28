@@ -13,7 +13,9 @@ import com.example.tax.domain.valueobject.Store;
 import com.example.tax.domain.valueobject.StoreId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -46,5 +48,15 @@ public class UserStoreAdapter implements UserStorePort {
     @Override
     public Boolean existsByUserSrlAndStoreId(Long userSrl, StoreId storeId) {
         return userStoreRepository.existsByUserSrlAndStoreId(userSrl, storeId.getId());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getAccessibleStores(Long userSrl) {
+        List<UserStoreEntity> accessList = userStoreRepository.findAllWithStoreByUserSrl(userSrl);
+
+        return accessList.stream()
+                .map(userStore -> userStore.getStore().getStoreId())
+                .toList();
     }
 }

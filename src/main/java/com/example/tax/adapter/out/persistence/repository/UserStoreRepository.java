@@ -23,4 +23,9 @@ public interface UserStoreRepository extends JpaRepository<UserStoreEntity, Long
      * 권한 회수 시 사용: 특정 사용자와 사업장의 매핑 데이터를 삭제합니다.
      */
     void deleteByUserSrlAndStoreSrl(Long userSrl, Long storeSrl);
+
+    @Query("SELECT us FROM UserStoreEntity us " +
+            "JOIN FETCH us.store " +
+            "WHERE us.user.srl = :userSrl")
+    List<UserStoreEntity> findAllWithStoreByUserSrl(@Param("userSrl") Long userSrl);
 }

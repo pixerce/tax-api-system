@@ -1,8 +1,8 @@
 package com.example.tax.adapter.in.web;
 
+import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
+import com.example.tax.adapter.in.web.dto.VatResultResponse;
 import com.example.tax.application.VatCollectionCoordinator;
-import com.example.tax.application.dto.DataCollectionResponse;
-import com.example.tax.application.dto.VatResultResponse;
 import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.TaskStatus;
 import org.junit.jupiter.api.DisplayName;
@@ -54,9 +54,9 @@ class TaxControllerTest {
                         .param("yearMonth", "2025-12") // 쿼리 파라미터 전달
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.storeId").value(storeIdStr))
-                .andExpect(jsonPath("$.status").value("COLLECTED"))
-                .andExpect(jsonPath("$.yearMonth").value("2025-12"))
+                .andExpect(jsonPath("$.data[0].storeId").value(storeIdStr))
+                .andExpect(jsonPath("$.data[0].status").value("COLLECTED"))
+                .andExpect(jsonPath("$.data[0].yearMonth").value("2025-12"))
                 .andDo(print());
     }
 
@@ -81,9 +81,9 @@ class TaxControllerTest {
                         .param("yearMonth", "2025-12")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.vat").value(expectedVat))
-                .andExpect(jsonPath("$.storeId").value(storeIdStr))
-                .andExpect(jsonPath("$.yearMonth").value("2025-12"))
+                .andExpect(jsonPath("$.data[0].vat").value(expectedVat))
+                .andExpect(jsonPath("$.data[0].storeId").value(storeIdStr))
+                .andExpect(jsonPath("$.data[0].yearMonth").value("2025-12"))
                 .andDo(print());
     }
 }

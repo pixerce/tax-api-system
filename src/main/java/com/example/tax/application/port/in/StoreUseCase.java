@@ -1,10 +1,11 @@
 package com.example.tax.application.port.in;
 
-import com.example.tax.application.dto.UserRoleResponse;
+import com.example.tax.adapter.in.web.dto.UserRoleResponse;
+import com.example.tax.adapter.in.web.dto.UserStoreAccessResponse;
 
 public interface StoreUseCase {
-    UserRoleResponse checkRoles(final Long userSrl, final String storeId);
+    UserRoleResponse checkPermission(final Long userSrl, final String storeId);
 
-    void assignStoreToManager(String storeId, Long userSrl);
-    void deleteStoreFromManager(String storeId, Long userSrl);
+    UserStoreAccessResponse assignStoreToManager(String storeId, Long userSrl);
+    UserStoreAccessResponse deleteStoreFromManager(String storeId, Long userSrl);
 }

@@ -1,7 +1,7 @@
 package com.example.tax.application;
 
-import com.example.tax.application.dto.DataCollectionRequest;
-import com.example.tax.application.dto.DataCollectionResponse;
+import com.example.tax.adapter.in.web.dto.DataCollectionRequest;
+import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
 import com.example.tax.application.mapper.DataCollectionMapper;
 import com.example.tax.application.port.out.CollectionTaskPort;
 import com.example.tax.domain.valueobject.CollectionTask;

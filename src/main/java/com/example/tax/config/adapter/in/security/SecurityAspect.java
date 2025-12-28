@@ -5,6 +5,7 @@ import com.example.tax.application.port.out.UserStorePort;
 import com.example.tax.domain.valueobject.StoreId;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityAspect {
 
     private final HttpServletRequest request;
@@ -28,9 +30,8 @@ public class SecurityAspect {
     }
 
     @Before("@annotation(com.example.tax.application.port.in.security.CheckStoreAccess)")
-    public void validateWorkplaceAccess(JoinPoint joinPoint) {
+    public void validateStoreAccess(JoinPoint joinPoint) {
         String role = request.getHeader("X-Admin-Role");
-        String adminId = request.getHeader("X-Admin-Id");
 
         if ("ADMIN".equals(role)) return;
 
@@ -52,13 +53,11 @@ public class SecurityAspect {
             }
         }
 
-        if (storeId == null || userSrl == null) {
+        if (storeId == null || userSrl == null)
             throw new IllegalArgumentException("권한 확인을 위한 사업장 식별자(storeId/userSrl)를 찾을 수 없습니다.");
-        }
 
         boolean hasAccess = userStorePort.existsByUserSrlAndStoreId(userSrl, StoreId.of(storeId));
-        if (!hasAccess) {
+        if (!hasAccess)
             throw new AccessDeniedException("해당 사업장에 대한 관리 권한이 없습니다.");
-        }
     }
 }

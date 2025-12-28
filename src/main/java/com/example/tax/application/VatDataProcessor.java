@@ -1,6 +1,6 @@
 package com.example.tax.application;
 
-import com.example.tax.application.dto.DataCollectionResponse;
+import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
 import com.example.tax.application.service.DataCollectionProcessor;
 import com.example.tax.application.service.DataCollectionProcessorFactory;
 import com.example.tax.domain.event.DataProcessingCompletedEvent;

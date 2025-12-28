@@ -41,9 +41,9 @@ public class StorePersistenceAdapter implements StorePort {
     @Override
     public Optional<Store> findByStoreId(final StoreId storeId) {
         Optional<StoreEntity> storeEntityOptional = this.storeRepository.findByStoreId(storeId.getId());
-        if (storeEntityOptional.isPresent()) {
+        if (storeEntityOptional.isPresent())
             return Optional.of(storeMapper.toDomain(storeEntityOptional.get()));
-        }
+
         return Optional.empty();
     }
 }
