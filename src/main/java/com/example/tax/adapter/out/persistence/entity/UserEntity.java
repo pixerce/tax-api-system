@@ -28,6 +28,14 @@ public class UserEntity extends AbstractBaseEntity {
         userStore.setStore(store);
 
         this.accessibleStores.add(userStore);
-        store.getAssignedUsers().add(userStore); // 상대방 객체에도 추가
+        store.getAssignedUsers().add(userStore);
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "srl=" + srl +
+                ", userName='" + userName +
+                '}';
     }
 }

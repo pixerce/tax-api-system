@@ -36,15 +36,16 @@ CREATE TABLE IF NOT EXISTS tax.store (
 
 CREATE TABLE IF NOT EXISTS tax.user_info (
     srl BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_name VARCHAR NOT NULL
+    user_name VARCHAR
 );
 
--- 3. 사용자-사업장 매핑 테이블 (권한 부여 테이블)
 CREATE TABLE IF NOT EXISTS tax.user_store (
-    srl BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_srl BIGINT NOT NULL,
     store_srl BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
-    CONSTRAINT fk_user_store_user FOREIGN KEY (user_srl) REFERENCES user_info (srl),
-    CONSTRAINT fk_user_store_store FOREIGN KEY (store_srl) REFERENCES store (srl)
+    PRIMARY KEY (user_srl, store_srl),
+
+    CONSTRAINT fk_user_store_user FOREIGN KEY (user_srl) REFERENCES tax.user_info (srl),
+    CONSTRAINT fk_user_store_store FOREIGN KEY (store_srl) REFERENCES tax.store (srl)
 );
