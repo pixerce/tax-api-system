@@ -33,6 +33,4 @@ public class StoreEntity extends AbstractBaseEntity {
         this.assignedUsers.add(userStore);
         user.getAccessibleStores().add(userStore); // 상대방 객체에도 추가
     }
-
-
 }
