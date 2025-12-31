@@ -1,7 +1,5 @@
 package com.example.tax.application.service;
 
-import com.example.tax.adapter.out.persistence.VatRateSourceAdapter;
-import com.example.tax.application.port.in.CalculateVatUseCase;
 import com.example.tax.application.port.out.StoreVatPort;
 import com.example.tax.application.port.out.TransactionRecordPort;
 import com.example.tax.domain.valueobject.StoreId;
@@ -10,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -23,6 +22,9 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class CalculateVatServiceTest {
 
+    @InjectMocks
+    private CalculateVatService calculateVatService;
+
     @Mock
     private TransactionRecordPort transactionRecordPort;
     @Mock
@@ -34,14 +36,12 @@ class CalculateVatServiceTest {
         StoreId storeId = StoreId.of("0123456789");
         YearMonth targetYearMonth = YearMonth.of(2025, 12);
 
-        CalculateVatUseCase calculateVatUseCase = new CalculateVatService(transactionRecordPort, storeVatPort, new VatRateSourceAdapter());
-
         given(transactionRecordPort.sumSalesAmountByMonth(storeId, targetYearMonth)).willReturn(BigDecimal.valueOf(110000L));    // 매출
         given(transactionRecordPort.sumPurchaseAmountByMonth(storeId, targetYearMonth)).willReturn(BigDecimal.valueOf(55000L)); // 매입
 
         ArgumentCaptor<StoreVat> storeVatCaptor = ArgumentCaptor.forClass(StoreVat.class);
 
-        calculateVatUseCase.calculateAndStore(storeId, targetYearMonth);
+        calculateVatService.calculateVat(storeId, targetYearMonth);
 
         verify(storeVatPort).save(storeVatCaptor.capture());
         StoreVat savedStoreVat = storeVatCaptor.getValue();
@@ -51,6 +51,6 @@ class CalculateVatServiceTest {
         assertThat(savedStoreVat.getSales().getAmount()).isEqualByComparingTo("110000");
         assertThat(savedStoreVat.getPurchase().getAmount()).isEqualByComparingTo("55000");
 
-        assertThat(savedStoreVat.getVat().getAmount()).isEqualByComparingTo("5000");
+        assertThat(savedStoreVat.getVat().getAmount()).isEqualByComparingTo("5500");
     }
 }

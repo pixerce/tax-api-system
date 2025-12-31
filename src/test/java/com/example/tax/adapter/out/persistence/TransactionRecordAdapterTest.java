@@ -6,6 +6,7 @@ import com.example.tax.adapter.out.persistence.repository.TransactionRecordRepos
 import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.TransactionRecord;
 import com.example.tax.domain.valueobject.TransactionRecordType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,11 @@ class TransactionRecordAdapterTest {
 
     private final StoreId storeId = StoreId.of("1234567890");
     private final YearMonth targetMonth = YearMonth.of(2025, 12);
+
+    @BeforeEach
+    void setUp() {
+        transactionRecordRepository.deleteAllInBatch();
+    }
 
     @Test
     @DisplayName("saveAll은 여러 개의 거래 기록을 한 번에 저장한다")

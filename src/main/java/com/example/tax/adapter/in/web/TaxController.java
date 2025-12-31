@@ -4,7 +4,10 @@ import com.example.tax.adapter.in.web.dto.ApiResponse;
 import com.example.tax.adapter.in.web.dto.DataCollectionRequest;
 import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
 import com.example.tax.adapter.in.web.dto.VatResultResponse;
-import com.example.tax.application.VatCollectionCoordinator;
+import com.example.tax.application.usecase.GetTaxStateUseCase;
+import com.example.tax.application.usecase.GetVatUseCase;
+import com.example.tax.application.usecase.RequestDataProcessUseCase;
+import com.example.tax.domain.valueobject.StoreVat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -17,12 +20,14 @@ import java.time.YearMonth;
 @RequiredArgsConstructor
 public class TaxController {
 
-    private final VatCollectionCoordinator vatCollectionCoordinator;
+    private final GetVatUseCase getVatUseCase;
+    private final GetTaxStateUseCase getTaxStateUseCase;
+    private final RequestDataProcessUseCase requestDataProcessUseCase;
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
     public ApiResponse<DataCollectionResponse> placeTaxDataProcess(@RequestBody DataCollectionRequest request) {
-        final DataCollectionResponse response = vatCollectionCoordinator.requestDataProcess(request);
+        final DataCollectionResponse response = requestDataProcessUseCase.requestDataProcess(request);
         return ApiResponse.of(response);
     }
 
@@ -30,15 +35,20 @@ public class TaxController {
     @GetMapping("/{storeId}/state")
     public ApiResponse<DataCollectionResponse> getTaxDataProcessCurrentState(@PathVariable String storeId
             , @RequestParam(name = "yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
-        final DataCollectionResponse response = vatCollectionCoordinator.getState(storeId, yearMonth);
+        final DataCollectionResponse response = getTaxStateUseCase.getState(storeId, yearMonth);
         return ApiResponse.of(response);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{storeId}/vat")
-    public ApiResponse<Object> getVat(@PathVariable String storeId
+    public ApiResponse<VatResultResponse> getVat(@PathVariable String storeId
             , @RequestParam(name = "yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
-        final VatResultResponse response = vatCollectionCoordinator.getVat(storeId, yearMonth);
+        final StoreVat storeVat = getVatUseCase.getVat(storeId, yearMonth);
+        final VatResultResponse response = VatResultResponse.builder()
+                .vat(storeVat.getVat().getAmount().longValue())
+                .storeId(storeVat.getStoreId())
+                .yearMonth(storeVat.getTargetYearMonth())
+                .build();
         return ApiResponse.of(response);
     }
 }

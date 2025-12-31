@@ -1,5 +1,6 @@
 package com.example.tax.application;
 
+import com.example.tax.application.port.out.DataProcessingEventPort;
 import com.example.tax.application.port.out.DataSourceReaderPort;
 import com.example.tax.application.port.out.TransactionRecordPort;
 import com.example.tax.application.service.DataCollectionProcessor;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Duration;
 import java.time.YearMonth;
@@ -38,7 +38,7 @@ class VatDataProcessorTest {
     @Mock
     private DataCollectionProcessorFactory dataCollectionProcessorFactory;
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private DataProcessingEventPort dataProcessingEventPort;
     @Mock
     private DataCollectionProcessor processor;
 
@@ -46,7 +46,7 @@ class VatDataProcessorTest {
 
     @BeforeEach
     void setUp() {
-        vatDataProcessor = new VatDataProcessor(executorService, dataCollectionProcessorFactory, eventPublisher);
+        vatDataProcessor = new VatDataProcessor(executorService, dataCollectionProcessorFactory, dataProcessingEventPort);
     }
 
     @Test

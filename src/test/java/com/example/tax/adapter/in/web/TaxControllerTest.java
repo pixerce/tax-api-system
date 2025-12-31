@@ -1,20 +1,24 @@
 package com.example.tax.adapter.in.web;
 
 import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
-import com.example.tax.adapter.in.web.dto.VatResultResponse;
-import com.example.tax.application.VatCollectionCoordinator;
+import com.example.tax.application.usecase.GetTaxStateUseCase;
+import com.example.tax.application.usecase.GetVatUseCase;
+import com.example.tax.application.usecase.RequestDataProcessUseCase;
+import com.example.tax.domain.valueobject.Money;
 import com.example.tax.domain.valueobject.StoreId;
+import com.example.tax.domain.valueobject.StoreVat;
 import com.example.tax.domain.valueobject.TaskStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 
@@ -24,14 +28,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithMockUser
-@WebMvcTest(controllers = TaxController.class) // 실제 컨트롤러 클래스명 기입
+@WebMvcTest(controllers = TaxController.class)
 class TaxControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private VatCollectionCoordinator vatCollectionCoordinator;
+    @MockBean
+    private GetVatUseCase getVatUseCase;
+
+    @MockBean
+    private GetTaxStateUseCase getTaxStateUseCase;
+
+    @MockBean
+    private RequestDataProcessUseCase requestDataProcessUseCase;
 
     @Test
     @DisplayName("상점 데이터 수집 상태 조회 테스트 - JSON 파싱 검증")
@@ -47,11 +57,11 @@ class TaxControllerTest {
                 .startedAt(LocalDateTime.now())
                 .build();
 
-        given(vatCollectionCoordinator.getState(storeIdStr, targetMonth))
+        given(getTaxStateUseCase.getState(storeIdStr, targetMonth))
                 .willReturn(mockResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tax/{storeId}/state", storeIdStr)
-                        .param("yearMonth", "2025-12") // 쿼리 파라미터 전달
+                        .param("yearMonth", "2025-12")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].storeId").value(storeIdStr))
@@ -66,15 +76,15 @@ class TaxControllerTest {
     void testGetVat() throws Exception {
         String storeIdStr = "0123456789";
         YearMonth targetMonth = YearMonth.of(2025, 12);
-        Long expectedVat = 1500000L;
+        long expectedVat = 1500000L;
 
-        VatResultResponse mockResponse = VatResultResponse.builder()
-                .vat(expectedVat)
+        StoreVat mockResponse = StoreVat.builder()
+                .vat(new Money(new BigDecimal(expectedVat)))
                 .storeId(StoreId.of(storeIdStr))
-                .yearMonth(targetMonth)
+                .targetYearMonth(targetMonth)
                 .build();
 
-        given(vatCollectionCoordinator.getVat(storeIdStr, targetMonth))
+        given(getVatUseCase.getVat(storeIdStr, targetMonth))
                 .willReturn(mockResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/tax/{storeId}/vat", storeIdStr)

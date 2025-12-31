@@ -6,13 +6,13 @@ import com.example.tax.adapter.out.persistence.repository.CollectionTaskReposito
 import com.example.tax.domain.valueobject.CollectionTask;
 import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.TaskStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Optional;
 
@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import({CollectionTaskAdapter.class, CollectionTaskMapper.class})
-//@ActiveProfiles("test") // 테스트용 설정(h2 등) 사용 시
 class CollectionTaskAdapterTest {
 
     @Autowired
@@ -31,6 +30,11 @@ class CollectionTaskAdapterTest {
 
     private final StoreId storeId = StoreId.of("0123456789");
     private final YearMonth targetMonth = YearMonth.of(2025, 12);
+
+    @BeforeEach
+    void setup() {
+        collectionTaskRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("save 메서드는 도메인 모델을 엔티티로 변환하여 저장하고 ID를 할당한다")
@@ -50,25 +54,23 @@ class CollectionTaskAdapterTest {
     @Test
     @DisplayName("findLastestTaskByStoreId는 가장 최근에 시작된 작업을 조회한다")
     void testFindLastestTaskByStoreId() {
+        // Given
+        saveEntity();
+        CollectionTaskEntity laterEntity = saveEntity();
 
-        LocalDateTime earlier = LocalDateTime.of(2025, 12, 1, 10, 0);
-        LocalDateTime later = LocalDateTime.of(2025, 12, 1, 11, 0);
-
-        saveEntity(earlier);
-        saveEntity(later);
-
+        // When
         Optional<CollectionTask> result = collectionTaskAdapter.findLastestTaskByStoreId(storeId.getId(), targetMonth);
 
+        // Then
         assertThat(result).isPresent();
-        assertThat(result.get().getStartedAt()).isEqualTo(later);
+        assertThat(result.get().getId()).isEqualTo(laterEntity.getSrl());
     }
 
-    private void saveEntity(LocalDateTime startedAt) {
-        collectionTaskRepository.save(CollectionTaskEntity.builder()
+    private CollectionTaskEntity saveEntity() {
+        return collectionTaskRepository.save(CollectionTaskEntity.builder()
                 .storeId(storeId.getId())
                 .targetYearMonth(targetMonth)
                 .status(TaskStatus.COLLECTING)
-                .startedAt(startedAt)
                 .build());
     }
 }
