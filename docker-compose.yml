@@ -1,0 +1,7 @@
+services:
+  tax-api-system:
+    build: .
+    ports:
+      - "8080:8080"
+    container_name: tax-api-system
+    restart: always
