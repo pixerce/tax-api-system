@@ -34,11 +34,11 @@ class CollectionTaskAdapterTest {
 
     @Test
     @DisplayName("save 메서드는 도메인 모델을 엔티티로 변환하여 저장하고 ID를 할당한다")
-    void testSaveAndIdAssigned() {
+    void testUpsertAndIdAssigned() {
         CollectionTask collectionTask = CollectionTask.create(storeId, targetMonth);
         collectionTask.started();
 
-        collectionTaskAdapter.save(collectionTask);
+        collectionTaskAdapter.upsert(collectionTask);
 
         assertThat(collectionTask.getId()).isNotNull();
 
@@ -54,8 +54,8 @@ class CollectionTaskAdapterTest {
         LocalDateTime earlier = LocalDateTime.of(2025, 12, 1, 10, 0);
         LocalDateTime later = LocalDateTime.of(2025, 12, 1, 11, 0);
 
-        saveEntity(earlier);
-        saveEntity(later);
+        upsertEntity(earlier);
+        upsertEntity(later);
 
         Optional<CollectionTask> result = collectionTaskAdapter.findLastestTaskByStoreId(storeId.getId(), targetMonth);
 
@@ -63,7 +63,7 @@ class CollectionTaskAdapterTest {
         assertThat(result.get().getStartedAt()).isEqualTo(later);
     }
 
-    private void saveEntity(LocalDateTime startedAt) {
+    private void upsertEntity(LocalDateTime startedAt) {
         collectionTaskRepository.save(CollectionTaskEntity.builder()
                 .storeId(storeId.getId())
                 .targetYearMonth(targetMonth)

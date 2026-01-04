@@ -6,6 +6,8 @@ import com.example.tax.adapter.in.web.dto.VatResultResponse;
 import com.example.tax.application.mapper.DataCollectionMapper;
 import com.example.tax.application.port.out.CollectionTaskPort;
 import com.example.tax.application.port.out.StoreVatPort;
+import com.example.tax.domain.exception.DuplicateCollectionTaskException;
+import com.example.tax.domain.valueobject.CollectionTask;
 import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.StoreVat;
 import com.example.tax.domain.valueobject.TaskStatus;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.YearMonth;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -50,12 +53,25 @@ public class VatCollectionCoordinator {
     }
 
     public DataCollectionResponse requestDataProcess(final DataCollectionRequest dataCollectionRequest) {
-        return collectionTaskPort.findLastestTaskByStoreId(
-                        dataCollectionRequest.getStoreId(),
-                        dataCollectionRequest.getTargetYearMonth())
-                .map(dataCollectionMapper::toDataCollectionResponse)
-                .orElseGet(() -> vatDataProcessor.collectDataAndCalculateVat(
-                        StoreId.of(dataCollectionRequest.getStoreId()), dataCollectionRequest.getTargetYearMonth()));
+        final StoreId storeId = StoreId.of(dataCollectionRequest.getStoreId());
+        final YearMonth targetYearMonth = dataCollectionRequest.getTargetYearMonth();
+
+        Optional<CollectionTask> task = collectionTaskPort.findLastestTaskByStoreId(storeId.getId(), targetYearMonth);
+
+        if (task.isPresent())
+            return dataCollectionMapper.toDataCollectionResponse(task.get());
+
+        final CollectionTask collectionTask = CollectionTask.create(storeId, targetYearMonth);
+        collectionTask.started();
+
+        try {
+            this.collectionTaskPort.save(collectionTask);
+        } catch (DuplicateCollectionTaskException e) {
+            return dataCollectionMapper.toDataCollectionResponse(collectionTask);
+        }
+
+        vatDataProcessor.collectDataAndCalculateVat(collectionTask);
+        return DataCollectionResponse.createCollectingResponse(storeId, targetYearMonth);
     }
 
 

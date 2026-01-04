@@ -28,7 +28,16 @@ public class CollectionTask {
         return this.id;
     }
 
-    public static CollectionTask create(StoreId storeId, YearMonth targetYearMonth) {
+    public static CollectionTask create(final Long id, final StoreId storeId, final YearMonth targetYearMonth) {
+        return CollectionTask.builder()
+                .id(id)
+                .storeId(storeId)
+                .targetYearMonth(targetYearMonth)
+                .status(TaskStatus.NOT_REQUESTED)
+                .build();
+    }
+
+    public static CollectionTask create(final StoreId storeId, final YearMonth targetYearMonth) {
         return CollectionTask.builder()
                 .storeId(storeId)
                 .targetYearMonth(targetYearMonth)

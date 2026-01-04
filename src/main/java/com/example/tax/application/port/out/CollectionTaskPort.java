@@ -9,5 +9,7 @@ public interface CollectionTaskPort {
 
     Optional<CollectionTask> findLastestTaskByStoreId(String storeId, YearMonth targetYearMonth);
 
+    void upsert(CollectionTask collectionTask);
+
     void save(CollectionTask collectionTask);
 }

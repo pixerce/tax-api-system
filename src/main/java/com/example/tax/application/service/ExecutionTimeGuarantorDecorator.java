@@ -8,7 +8,7 @@ public class ExecutionTimeGuarantorDecorator implements DataCollectionProcessor 
     private final Long executionTime;
 
     private final Long startTime;
-    protected static final Long DEFAULT_EXECUTION_TIME = 5 * 60 * 1000L;
+    protected static final Long DEFAULT_EXECUTION_TIME = 1 * 60 * 1000L;
 
     public ExecutionTimeGuarantorDecorator(DataCollectionProcessor delegate, Long executionTime) {
         this.delegate = delegate;

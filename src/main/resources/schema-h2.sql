@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS tax.collection_task (
     status VARCHAR,
     started_at TIMESTAMP,
     ended_at TIMESTAMP,
-    error_message VARCHAR
+    error_message VARCHAR,
+
+    CONSTRAINT uk_store_year_month UNIQUE (store_id, target_year_month)
     );
 
 CREATE TABLE IF NOT EXISTS tax.transaction_record (
