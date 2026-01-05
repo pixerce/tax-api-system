@@ -1,7 +1,6 @@
 package com.example.tax.adapter.out.persistence;
 
-import com.example.tax.adapter.out.persistence.entity.TransactionRecordEntity;
-import com.example.tax.adapter.out.persistence.mapper.TransactionRecordMapper;
+import com.example.tax.adapter.out.persistence.repository.JdbcTransactionRepository;
 import com.example.tax.adapter.out.persistence.repository.TransactionRecordRepository;
 import com.example.tax.application.port.out.TransactionRecordPort;
 import com.example.tax.domain.valueobject.StoreId;
@@ -20,16 +19,14 @@ import java.util.List;
 public class TransactionRecordAdapter implements TransactionRecordPort {
 
     private final TransactionRecordRepository transactionRecordRepository;
-    private final TransactionRecordMapper transactionRecordMapper;
+    private final JdbcTransactionRepository jdbcTransactionRepository;
 
     @Override
     public void saveAll(final List<TransactionRecord> recordList) {
         if (recordList == null || recordList.isEmpty())
             return;
 
-        List<TransactionRecordEntity> recordEntityList
-                = recordList.stream().map(this.transactionRecordMapper::toEntity).toList();
-        transactionRecordRepository.saveAll(recordEntityList);
+        jdbcTransactionRepository.saveAll(recordList);
     }
 
     @Override
