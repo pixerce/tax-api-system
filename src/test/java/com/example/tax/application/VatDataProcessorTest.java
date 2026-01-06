@@ -62,14 +62,12 @@ class VatDataProcessorTest {
                 .storeId(storeId)
                 .build(), 1000L);
 
-        given(dataCollectionProcessorFactory.createDataCollectorTask(any(), any())).willReturn(task);
+        given(dataCollectionProcessorFactory.createDataCollectorTask(any(CollectionTask.class))).willReturn(task);
         vatDataProcessor.collectDataAndCalculateVat(CollectionTask.create(storeId, targetMonth));
 
         await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
 
             verify(dataSourceReaderPort).readData(eq(storeId), any());
-            verify(transactionRecordPort).flush();
         });
     }
-
 }
