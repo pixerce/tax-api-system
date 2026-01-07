@@ -55,10 +55,7 @@ public class StoreService implements StoreUseCase {
         if (storeOptional.isEmpty())
             throw new InvalidStateException("해당 사업장이 존재하지 않습니다.");
 
-        if (!userStorePort.existsByUserSrlAndStoreId(userSrl, storeId))
-            throw new InvalidStateException("이미 권한이 제거된 사업장입니다.");
-
-        userStorePort.removeAccess(userSrl, storeId.getId());
+        userStorePort.removeAccess(userSrl, storeOptional.get().getSrl());
         return new UserStoreAccessResponse(userStorePort.getAccessibleStores(userSrl));
     }
 }

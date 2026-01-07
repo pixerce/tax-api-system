@@ -10,14 +10,12 @@ import com.example.tax.adapter.out.persistence.repository.UserRepository;
 import com.example.tax.adapter.out.persistence.repository.UserStoreRepository;
 import com.example.tax.application.port.out.UserStorePort;
 import com.example.tax.domain.exception.InvalidStateException;
-import com.example.tax.domain.valueobject.Store;
 import com.example.tax.domain.valueobject.StoreId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -42,13 +40,14 @@ public class UserStoreAdapter implements UserStorePort {
         userStoreRepository.save(userStoreEntity);
     }
 
+    @Transactional
     @Override
-    public void removeAccess(final Long userId, final String storeId) {
-        Optional<StoreEntity> storeOptional = storeRepository.findByStoreId(StoreId.of(storeId).getId());
-        StoreEntity entity = storeOptional.orElseThrow(
-                () -> new InvalidStateException("상점 정보가 없습니다. storeId: " + storeId));
-        Store store = storeMapper.toDomain(entity);
-        userStoreRepository.deleteByUserSrlAndStoreSrl(userId, store.getSrl());
+    public void removeAccess(final Long userSrl, final Long storeSrl) {
+        final UserStoreId id = new UserStoreId(userSrl, storeSrl);
+        if (!userStoreRepository.existsById(id))
+            throw new InvalidStateException(String.format("권한이 없습니다. userSrl={}, storeSrl={}", userSrl, storeSrl));
+
+        userStoreRepository.deleteById(id);
     }
 
     @Override
