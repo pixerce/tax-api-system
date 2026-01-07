@@ -1,13 +1,14 @@
 package com.example.tax.adapter.out.persistence.repository;
 
 import com.example.tax.adapter.out.persistence.entity.UserStoreEntity;
+import com.example.tax.adapter.out.persistence.entity.UserStoreId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface UserStoreRepository extends JpaRepository<UserStoreEntity, Long> {
+public interface UserStoreRepository extends JpaRepository<UserStoreEntity, UserStoreId> {
     @Query("SELECT us FROM UserStoreEntity us JOIN FETCH us.store WHERE us.user.srl = :userSrl")
     List<UserStoreEntity> findAllByUserId(@Param("userSrl") Long userId);
 

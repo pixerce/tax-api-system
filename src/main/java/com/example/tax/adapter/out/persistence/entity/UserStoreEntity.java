@@ -34,13 +34,10 @@ public class UserStoreEntity {
     @JoinColumn(name = "store_srl")
     private StoreEntity store;
 
-    public static UserStoreEntity createAccess(UserEntity user, StoreEntity store) {
+    public static UserStoreEntity createAccess(final UserEntity user, final StoreEntity store) {
         UserStoreEntity userStore = new UserStoreEntity();
         userStore.setUser(user);
         userStore.setStore(store);
-
-        user.getAccessibleStores().add(userStore);
-        store.getAssignedUsers().add(userStore);
 
         return userStore;
     }

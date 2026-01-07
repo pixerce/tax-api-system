@@ -3,6 +3,7 @@ package com.example.tax.adapter.out.persistence;
 import com.example.tax.adapter.out.persistence.entity.StoreEntity;
 import com.example.tax.adapter.out.persistence.entity.UserEntity;
 import com.example.tax.adapter.out.persistence.entity.UserStoreEntity;
+import com.example.tax.adapter.out.persistence.entity.UserStoreId;
 import com.example.tax.adapter.out.persistence.mapper.StoreMapper;
 import com.example.tax.adapter.out.persistence.repository.StoreRepository;
 import com.example.tax.adapter.out.persistence.repository.UserRepository;
@@ -27,10 +28,15 @@ public class UserStoreAdapter implements UserStorePort {
     private final StoreRepository storeRepository;
     private final StoreMapper storeMapper;
 
+    @Transactional
     @Override
     public void saveAccess(final Long userSrl, final Long storeSrl) {
-        UserEntity userEntity = userRepository.getReferenceById(userSrl);
-        StoreEntity storeEntity = storeRepository.getReferenceById(storeSrl);
+        final UserStoreId id = new UserStoreId(userSrl, storeSrl);
+        if (userStoreRepository.existsById(id))
+            return;
+
+        final UserEntity userEntity = userRepository.getReferenceById(userSrl);
+        final StoreEntity storeEntity = storeRepository.getReferenceById(storeSrl);
 
         UserStoreEntity userStoreEntity = UserStoreEntity.createAccess(userEntity, storeEntity);
         userStoreRepository.save(userStoreEntity);

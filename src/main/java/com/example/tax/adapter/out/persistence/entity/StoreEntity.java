@@ -22,7 +22,7 @@ public class StoreEntity extends AbstractBaseEntity {
         this.storeId = storeId;
     }
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<UserStoreEntity> assignedUsers = new ArrayList<>();
 
     public void assignUser(UserEntity user) {

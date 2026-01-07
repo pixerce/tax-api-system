@@ -41,15 +41,10 @@ public class StoreService implements StoreUseCase {
         if (storeOptional.isEmpty())
             throw new InvalidStateException("해당 사업장이 존재하지 않습니다.");
 
-        if (userStorePort.existsByUserSrlAndStoreId(userSrl, storeId))
-            throw new InvalidStateException("이미 권한이 부여된 사업장입니다.");
-
         userStorePort.saveAccess(userSrl, storeOptional.get().getSrl());
 
         return new UserStoreAccessResponse(userStorePort.getAccessibleStores(userSrl));
     }
-
-
 
     @Override
     public UserStoreAccessResponse deleteStoreFromManager(String storeIdStr, Long userSrl) {
@@ -57,13 +52,11 @@ public class StoreService implements StoreUseCase {
 
         final StoreId storeId = StoreId.of(storeIdStr);
         final Optional<Store> storeOptional = storePort.findByStoreId(storeId);
-        if (!storeOptional.isPresent()) {
+        if (storeOptional.isEmpty())
             throw new InvalidStateException("해당 사업장이 존재하지 않습니다.");
-        }
 
-        if (!userStorePort.existsByUserSrlAndStoreId(userSrl, storeId)) {
+        if (!userStorePort.existsByUserSrlAndStoreId(userSrl, storeId))
             throw new InvalidStateException("이미 권한이 제거된 사업장입니다.");
-        }
 
         userStorePort.removeAccess(userSrl, storeId.getId());
         return new UserStoreAccessResponse(userStorePort.getAccessibleStores(userSrl));
