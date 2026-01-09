@@ -4,8 +4,10 @@ import com.example.tax.adapter.in.web.dto.ApiResponse;
 import com.example.tax.adapter.in.web.dto.UserRoleResponse;
 import com.example.tax.adapter.in.web.dto.UserStoreAccessResponse;
 import com.example.tax.application.port.in.StoreUseCase;
+import com.example.tax.application.port.in.dto.AssignRoleCommand;
 import com.example.tax.application.port.in.security.AdminOnly;
 import com.example.tax.application.port.in.security.CheckStoreAccess;
+import com.example.tax.domain.valueobject.ManagerId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,10 +25,10 @@ public class StoreAccessManagementController {
     @AdminOnly
     @PostMapping("/{storeId}/assignments")
     public ApiResponse<UserStoreAccessResponse> assignRole(@PathVariable("storeId") String storeId
-            , @RequestParam(name = "userSrl") Long userSrl) {
-        log.info("request: storeId={}, userSrl={}", storeId, userSrl);
+            , @RequestParam(name = "managerId") Long managerId) {
+        log.info("request: storeId={}, managerId={}", storeId, managerId);
 
-        return ApiResponse.of(storeUseCase.assignStoreToManager(storeId, userSrl));
+        return ApiResponse.of(storeUseCase.assignStoreToManager(new AssignRoleCommand(ManagerId.of(String.valueOf(managerId)), storeId)));
     }
 
     @ResponseStatus(HttpStatus.OK)

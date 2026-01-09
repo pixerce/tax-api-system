@@ -3,7 +3,7 @@
 @userSrl = 2
 
 ### 권한 부여
-POST http://localhost:8080/api/v1/stores/{{storeId}}/assignments?userSrl={{userSrl}}
+POST http://localhost:8080/api/v1/stores/{{storeId}}/assignments?managerId={{userSrl}}
 X-Admin-Role: ADMIN
 
 

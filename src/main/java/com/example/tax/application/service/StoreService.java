@@ -3,6 +3,7 @@ package com.example.tax.application.service;
 import com.example.tax.adapter.in.web.dto.UserRoleResponse;
 import com.example.tax.adapter.in.web.dto.UserStoreAccessResponse;
 import com.example.tax.application.port.in.StoreUseCase;
+import com.example.tax.application.port.in.dto.AssignRoleCommand;
 import com.example.tax.application.port.out.StorePort;
 import com.example.tax.application.port.out.UserPort;
 import com.example.tax.application.port.out.UserStorePort;
@@ -33,17 +34,17 @@ public class StoreService implements StoreUseCase {
     }
 
     @Override
-    public UserStoreAccessResponse assignStoreToManager(String storeIdStr, Long userSrl) {
-        userPort.checkExistUser(userSrl);
+    public UserStoreAccessResponse assignStoreToManager(final AssignRoleCommand assignRoleCommand) {
+        userPort.checkExistUser(assignRoleCommand.managerId().id());
 
-        final StoreId storeId = StoreId.of(storeIdStr);
+        final StoreId storeId = StoreId.of(assignRoleCommand.storeId());
         final Optional<Store> storeOptional = storePort.findByStoreId(storeId);
         if (storeOptional.isEmpty())
             throw new InvalidStateException("해당 사업장이 존재하지 않습니다.");
 
-        userStorePort.saveAccess(userSrl, storeOptional.get().getSrl());
+        userStorePort.saveAccess(assignRoleCommand.managerId().id(), storeOptional.get().getSrl());
 
-        return new UserStoreAccessResponse(userStorePort.getAccessibleStores(userSrl));
+        return new UserStoreAccessResponse(userStorePort.getAccessibleStores(assignRoleCommand.managerId().id()));
     }
 
     @Override
