@@ -5,6 +5,7 @@ import com.example.tax.application.port.out.CollectionTaskPort;
 import com.example.tax.application.service.DataCollectionProcessor;
 import com.example.tax.application.service.DataCollectionProcessorFactory;
 import com.example.tax.domain.event.DataProcessingFailedEvent;
+import com.example.tax.domain.valueobject.CollectionTask;
 import com.example.tax.domain.valueobject.StoreId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,10 +59,10 @@ public class VatDataProcessingIntegrationTest {
     @Test
     @DisplayName("성공 시 Completed 이벤트를 발행하고 두 핸들러가 호출된다")
     void testSuccessEventFlow() {
-        given(factory.createDataCollectorTask(any(), any())).willReturn(processor);
+        given(factory.createDataCollectorTask(any(CollectionTask.class))).willReturn(processor);
         given(processor.process()).willReturn(null);
 
-        vatDataProcessor.collectDataAndCalculateVat(storeId, targetMonth);
+        vatDataProcessor.collectDataAndCalculateVat(CollectionTask.create(storeId, targetMonth));
 
         await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
             verify(eventAdapter, times(1)).handleCompletedEvent(any());
@@ -72,17 +73,16 @@ public class VatDataProcessingIntegrationTest {
     @Test
     @DisplayName("실패 시 Failed 이벤트를 발행하고 실패 핸들러가 호출된다")
     void testFailureEventFlow() {
-        given(factory.createDataCollectorTask(any(), any())).willReturn(processor);
+        given(factory.createDataCollectorTask(any(CollectionTask.class))).willReturn(processor);
         given(processor.process()).willThrow(new RuntimeException("Processing Error"));
 
-        vatDataProcessor.collectDataAndCalculateVat(storeId, targetMonth);
+        vatDataProcessor.collectDataAndCalculateVat(CollectionTask.create(storeId, targetMonth));
 
         await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
             long eventCount = events.stream(DataProcessingFailedEvent.class).count();
             assertThat(eventCount).isEqualTo(1);
 
             verify(eventAdapter, times(1)).handleFailedEvent(any());
-            verify(eventAdapter, times(1)).handleStartedEvent(any());
         });
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface UserStorePort {
     void saveAccess(Long userSrl, Long storeSrl);
-    void removeAccess(Long userSrl, String storeId);
+    void removeAccess(Long userSrl, Long storeSrl);
 
     Boolean existsByUserSrlAndStoreId(Long userSrl, StoreId storeId);
 

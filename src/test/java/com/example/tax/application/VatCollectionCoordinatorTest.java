@@ -4,6 +4,7 @@ import com.example.tax.adapter.in.web.dto.DataCollectionRequest;
 import com.example.tax.adapter.in.web.dto.DataCollectionResponse;
 import com.example.tax.application.mapper.DataCollectionMapper;
 import com.example.tax.application.port.out.CollectionTaskPort;
+import com.example.tax.domain.exception.DuplicateCollectionTaskException;
 import com.example.tax.domain.valueobject.CollectionTask;
 import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.TaskStatus;
@@ -20,8 +21,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,17 +67,22 @@ class VatCollectionCoordinatorTest {
     }
 
     @Test
-    @DisplayName("기존 태스크가 없는 경우 새로운 수집 유스케이스 호출")
-    void initiateNewCollectionTest() {
-        var storeId = "1234567890";
-        var targetMonth = YearMonth.of(2025, 12);
-        var request = new DataCollectionRequest(storeId, targetMonth);
+    @DisplayName("동시성 이슈로 저장 실패 시(Duplicate 예외 발생), 프로세서는 호출되지 않아야 한다")
+    void should_not_call_processor_when_save_fails() {
 
-        given(collectionTaskPort.findLastestTaskByStoreId(any(), any())).willReturn(Optional.empty());
+        String storeId = "1234567890";
+        YearMonth yearMonth = YearMonth.of(2024, 1);
+        DataCollectionRequest request = new DataCollectionRequest(storeId, yearMonth);
+
+        given(collectionTaskPort.findLastestTaskByStoreId(storeId, yearMonth))
+                .willReturn(Optional.empty());
+
+        willThrow(new DuplicateCollectionTaskException("중복 요청 발생"))
+                .given(collectionTaskPort).save(any(CollectionTask.class));
 
         vatCollectionCoordinator.requestDataProcess(request);
 
-        verify(vatDataProcessor, times(1))
-                .collectDataAndCalculateVat(argThat(id -> id.getId().equals(storeId)), eq(targetMonth));
+        verify(vatDataProcessor, never()).collectDataAndCalculateVat(any());
+        verify(collectionTaskPort).save(any(CollectionTask.class));
     }
 }

@@ -3,20 +3,19 @@ package com.example.tax.adapter.out.persistence;
 import com.example.tax.adapter.out.persistence.entity.StoreEntity;
 import com.example.tax.adapter.out.persistence.entity.UserEntity;
 import com.example.tax.adapter.out.persistence.entity.UserStoreEntity;
+import com.example.tax.adapter.out.persistence.entity.UserStoreId;
 import com.example.tax.adapter.out.persistence.mapper.StoreMapper;
 import com.example.tax.adapter.out.persistence.repository.StoreRepository;
 import com.example.tax.adapter.out.persistence.repository.UserRepository;
 import com.example.tax.adapter.out.persistence.repository.UserStoreRepository;
 import com.example.tax.application.port.out.UserStorePort;
 import com.example.tax.domain.exception.InvalidStateException;
-import com.example.tax.domain.valueobject.Store;
 import com.example.tax.domain.valueobject.StoreId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -27,22 +26,28 @@ public class UserStoreAdapter implements UserStorePort {
     private final StoreRepository storeRepository;
     private final StoreMapper storeMapper;
 
+    @Transactional
     @Override
     public void saveAccess(final Long userSrl, final Long storeSrl) {
-        UserEntity userEntity = userRepository.getReferenceById(userSrl);
-        StoreEntity storeEntity = storeRepository.getReferenceById(storeSrl);
+        final UserStoreId id = new UserStoreId(userSrl, storeSrl);
+        if (userStoreRepository.existsById(id))
+            return;
+
+        final UserEntity userEntity = userRepository.getReferenceById(userSrl);
+        final StoreEntity storeEntity = storeRepository.getReferenceById(storeSrl);
 
         UserStoreEntity userStoreEntity = UserStoreEntity.createAccess(userEntity, storeEntity);
         userStoreRepository.save(userStoreEntity);
     }
 
+    @Transactional
     @Override
-    public void removeAccess(final Long userId, final String storeId) {
-        Optional<StoreEntity> storeOptional = storeRepository.findByStoreId(StoreId.of(storeId).getId());
-        StoreEntity entity = storeOptional.orElseThrow(
-                () -> new InvalidStateException("상점 정보가 없습니다. storeId: " + storeId));
-        Store store = storeMapper.toDomain(entity);
-        userStoreRepository.deleteByUserSrlAndStoreSrl(userId, store.getSrl());
+    public void removeAccess(final Long userSrl, final Long storeSrl) {
+        final UserStoreId id = new UserStoreId(userSrl, storeSrl);
+        if (!userStoreRepository.existsById(id))
+            throw new InvalidStateException(String.format("권한이 없습니다. userSrl={}, storeSrl={}", userSrl, storeSrl));
+
+        userStoreRepository.deleteById(id);
     }
 
     @Override

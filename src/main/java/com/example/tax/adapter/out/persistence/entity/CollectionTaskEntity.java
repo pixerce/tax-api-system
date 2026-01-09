@@ -51,4 +51,17 @@ public class CollectionTaskEntity extends AbstractBaseEntity {
         this.errorMessage = errorMessage;
         this.targetYearMonth = targetYearMonth;
     }
+
+    @Override
+    public String toString() {
+        return "CollectionTaskEntity{" +
+                "endedAt=" + endedAt +
+                ", storeId='" + storeId + '\'' +
+                ", targetYearMonth=" + targetYearMonth +
+                ", status=" + status +
+                ", startedAt=" + startedAt +
+                ", errorMessage='" + errorMessage + '\'' +
+                ", srl=" + srl +
+                '}';
+    }
 }

@@ -2,6 +2,7 @@ package com.example.tax.adapter.out.persistence;
 
 import com.example.tax.adapter.out.persistence.entity.TransactionRecordEntity;
 import com.example.tax.adapter.out.persistence.mapper.TransactionRecordMapper;
+import com.example.tax.adapter.out.persistence.repository.JdbcTransactionRepository;
 import com.example.tax.adapter.out.persistence.repository.TransactionRecordRepository;
 import com.example.tax.domain.valueobject.StoreId;
 import com.example.tax.domain.valueobject.TransactionRecord;
@@ -20,7 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({TransactionRecordAdapter.class, TransactionRecordMapper.class})
+@Import({TransactionRecordAdapter.class, TransactionRecordMapper.class, JdbcTransactionRepository.class})
 class TransactionRecordAdapterTest {
 
     @Autowired

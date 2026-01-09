@@ -17,6 +17,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+      settings:
+        web-allow-others: true
 
   datasource:
     url: jdbc:h2:mem:taxapp;
@@ -32,3 +34,12 @@ spring:
 excel:
   sample:
     location: classpath:sample/excel/sample.xlsx
+
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        jdbc:
+#          core:
+#            JdbcTemplate: DEBUG
+#            StatementCreatorUtils: TRACE

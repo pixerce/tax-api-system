@@ -1,9 +1,6 @@
 package com.example.tax.adapter.out.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +16,7 @@ public class UserEntity extends AbstractBaseEntity {
     @Column(name = "user_name")
     private String userName;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<UserStoreEntity> accessibleStores = new ArrayList<>();
 
     public void addStoreAccess(StoreEntity store) {

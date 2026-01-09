@@ -1,0 +1,22 @@
+
+@storeId = 1234567890
+@userSrl = 2
+@targetYearMonth = 2025-08
+
+### 데이터 수집 요청
+POST http://localhost:8080/api/v1/tax
+Content-Type: application/json
+
+{
+  "storeId": "{{storeId}}",
+  "targetYearMonth": "{{targetYearMonth}}"
+}
+
+### 데이터 수집 상태 조회
+GET http://localhost:8080/api/v1/tax/{{storeId}}/state?yearMonth={{targetYearMonth}}
+
+
+### 부가세 조회
+GET http://localhost:8080/api/v1/tax/{{storeId}}/vat?yearMonth={{targetYearMonth}}
+
+X-Admin-Role: MANAGER

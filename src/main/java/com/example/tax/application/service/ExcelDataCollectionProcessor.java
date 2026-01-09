@@ -13,7 +13,6 @@ public class ExcelDataCollectionProcessor implements DataCollectionProcessor {
 
     public StoreId process() {
         dataSourceReaderPort.readData(storeId, transactionRecordPort::saveAll);
-        transactionRecordPort.flush();
         return storeId;
     }
 

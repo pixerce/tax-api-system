@@ -6,6 +6,7 @@ import com.example.tax.application.service.DataCollectionProcessor;
 import com.example.tax.application.service.DataCollectionProcessorFactory;
 import com.example.tax.application.service.ExcelDataCollectionProcessor;
 import com.example.tax.application.service.ExecutionTimeGuarantorDecorator;
+import com.example.tax.domain.valueobject.CollectionTask;
 import com.example.tax.domain.valueobject.StoreId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,14 +62,12 @@ class VatDataProcessorTest {
                 .storeId(storeId)
                 .build(), 1000L);
 
-        given(dataCollectionProcessorFactory.createDataCollectorTask(any(), any())).willReturn(task);
-        vatDataProcessor.collectDataAndCalculateVat(storeId, targetMonth);
+        given(dataCollectionProcessorFactory.createDataCollectorTask(any(CollectionTask.class))).willReturn(task);
+        vatDataProcessor.collectDataAndCalculateVat(CollectionTask.create(storeId, targetMonth));
 
         await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
 
             verify(dataSourceReaderPort).readData(eq(storeId), any());
-            verify(transactionRecordPort).flush();
         });
     }
-
 }

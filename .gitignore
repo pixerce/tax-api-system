@@ -27,3 +27,5 @@ tmp/
 .env
 *.properties
 !application.properties # 예외적으로 기본 설정만 올릴 경우
+
+.DS_Store
