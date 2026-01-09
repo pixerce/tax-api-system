@@ -1,9 +1,22 @@
 package com.example.tax.application.port.in.dto;
 
 import com.example.tax.domain.valueobject.ManagerId;
+import com.example.tax.domain.valueobject.StoreId;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-public record AssignRoleCommand (ManagerId managerId, String storeId){
-    public AssignRoleCommand(String managerId, String storeId){
-        this(ManagerId.of(managerId), storeId);
+@Getter
+@EqualsAndHashCode
+public class AssignRoleCommand {
+    private final ManagerId managerId;
+    private final StoreId storeId;
+
+    private AssignRoleCommand(String managerId, String storeId) {
+        this.managerId = ManagerId.of(managerId);
+        this.storeId = StoreId.of(storeId);
+    }
+
+    public static AssignRoleCommand of(String managerId, String storeId) {
+        return new AssignRoleCommand(managerId, storeId);
     }
 }

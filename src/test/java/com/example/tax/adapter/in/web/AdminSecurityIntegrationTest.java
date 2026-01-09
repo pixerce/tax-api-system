@@ -3,7 +3,6 @@ package com.example.tax.adapter.in.web;
 import com.example.tax.application.port.in.StoreUseCase;
 import com.example.tax.application.port.in.dto.AssignRoleCommand;
 import com.example.tax.application.port.out.UserStorePort;
-import com.example.tax.domain.valueobject.ManagerId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +97,6 @@ class AdminSecurityIntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        verify(storeUseCase, times(1)).assignStoreToManager(eq(new AssignRoleCommand(ManagerId.of("1"),"1203456789")));
+        verify(storeUseCase, times(1)).assignStoreToManager(eq(AssignRoleCommand.of("1","1203456789")));
     }
 }

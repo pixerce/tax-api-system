@@ -6,7 +6,6 @@ import com.example.tax.application.port.in.StoreUseCase;
 import com.example.tax.application.port.in.dto.AssignRoleCommand;
 import com.example.tax.application.port.out.UserStorePort;
 import com.example.tax.config.adapter.in.security.SecurityAspect;
-import com.example.tax.domain.valueobject.ManagerId;
 import com.example.tax.domain.valueobject.StoreId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,7 +60,7 @@ class StoreAccessManagementControllerTest {
         // 기존에 보유하고 있던 상점들 + 새로 추가된 상점을 포함한 응답 리스트
         UserStoreAccessResponse response = new UserStoreAccessResponse(List.of("0123456789", "1234567890", "3456789012"));
 
-        given(storeUseCase.assignStoreToManager(new AssignRoleCommand(ManagerId.of("123"), newStoreId)))
+        given(storeUseCase.assignStoreToManager(AssignRoleCommand.of("123", newStoreId)))
                 .willReturn(response);
 
         // When & Then

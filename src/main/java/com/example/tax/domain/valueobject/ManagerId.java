@@ -1,8 +1,17 @@
 package com.example.tax.domain.valueobject;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.springframework.util.StringUtils;
 
-public record ManagerId (Long id) {
+@Getter
+@EqualsAndHashCode
+public class ManagerId {
+    private Long id;
+
+    private ManagerId(Long id) {
+        this.id = id;
+    }
 
     public static ManagerId of(String id) {
         if (!StringUtils.hasText(id))

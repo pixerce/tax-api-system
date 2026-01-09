@@ -35,16 +35,15 @@ public class StoreService implements StoreUseCase {
 
     @Override
     public UserStoreAccessResponse assignStoreToManager(final AssignRoleCommand assignRoleCommand) {
-        userPort.checkExistUser(assignRoleCommand.managerId().id());
-
-        final StoreId storeId = StoreId.of(assignRoleCommand.storeId());
-        final Optional<Store> storeOptional = storePort.findByStoreId(storeId);
+        userPort.checkExistUser(assignRoleCommand.getManagerId().getId());
+        final Long managerId = assignRoleCommand.getManagerId().getId();
+        final Optional<Store> storeOptional = storePort.findByStoreId(assignRoleCommand.getStoreId());
         if (storeOptional.isEmpty())
             throw new InvalidStateException("해당 사업장이 존재하지 않습니다.");
 
-        userStorePort.saveAccess(assignRoleCommand.managerId().id(), storeOptional.get().getSrl());
+        userStorePort.saveAccess(managerId, storeOptional.get().getSrl());
 
-        return new UserStoreAccessResponse(userStorePort.getAccessibleStores(assignRoleCommand.managerId().id()));
+        return new UserStoreAccessResponse(userStorePort.getAccessibleStores(managerId));
     }
 
     @Override
