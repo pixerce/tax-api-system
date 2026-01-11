@@ -4,6 +4,7 @@ import com.example.tax.adapter.in.web.dto.ApiResponse;
 import com.example.tax.adapter.in.web.dto.UserRoleResponse;
 import com.example.tax.adapter.in.web.dto.UserStoreAccessResponse;
 import com.example.tax.application.port.in.StoreUseCase;
+import com.example.tax.application.port.in.dto.AssignRoleCommand;
 import com.example.tax.application.port.in.security.AdminOnly;
 import com.example.tax.application.port.in.security.CheckStoreAccess;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,10 @@ public class StoreAccessManagementController {
     @AdminOnly
     @PostMapping("/{storeId}/assignments")
     public ApiResponse<UserStoreAccessResponse> assignRole(@PathVariable("storeId") String storeId
-            , @RequestParam(name = "userSrl") Long userSrl) {
-        log.info("request: storeId={}, userSrl={}", storeId, userSrl);
+            , @RequestParam(name = "managerId") String managerId) {
+        log.info("request: storeId={}, managerId={}", storeId, managerId);
 
-        return ApiResponse.of(storeUseCase.assignStoreToManager(storeId, userSrl));
+        return ApiResponse.of(storeUseCase.assignStoreToManager(AssignRoleCommand.of(managerId, storeId)));
     }
 
     @ResponseStatus(HttpStatus.OK)

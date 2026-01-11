@@ -1,6 +1,7 @@
 package com.example.tax.adapter.in.web;
 
 import com.example.tax.application.port.in.StoreUseCase;
+import com.example.tax.application.port.in.dto.AssignRoleCommand;
 import com.example.tax.application.port.out.UserStorePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,7 @@ class AdminSecurityIntegrationTest {
     @DisplayName("AdminOnly: ADMIN이 아닌 사용자가 할당 요청을 하면 실패한다")
     void assignRole_NotAdminFail() throws Exception {
         mockMvc.perform(post("/api/v1/stores/1023456789/assignments")
-                        .param("userSrl", "1")
+                        .param("managerId", "1")
                         .header("X-Admin-Role", "MANAGER"))
                 .andExpect(status().isForbidden())
                 .andDo(print());
@@ -91,11 +92,11 @@ class AdminSecurityIntegrationTest {
     void assignRole_AdminSuccess() throws Exception {
         mockMvc.perform(post("/api/v1/stores/1203456789/assignments")
                         .with(csrf())
-                        .param("userSrl", "1")
+                        .param("managerId", "1")
                         .header("X-Admin-Role", "ADMIN"))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        verify(storeUseCase, times(1)).assignStoreToManager(eq("1203456789"), eq(1L));
+        verify(storeUseCase, times(1)).assignStoreToManager(eq(AssignRoleCommand.of("1","1203456789")));
     }
 }

@@ -30,11 +30,6 @@ public class TransactionRecordAdapter implements TransactionRecordPort {
     }
 
     @Override
-    public void flush() {
-        transactionRecordRepository.flush();
-    }
-
-    @Override
     public BigDecimal sumSalesAmountByMonth(final StoreId storeId, final YearMonth targetYearMonth) {
         LocalDate start = targetYearMonth.atDay(1);
         LocalDate end = targetYearMonth.atEndOfMonth();

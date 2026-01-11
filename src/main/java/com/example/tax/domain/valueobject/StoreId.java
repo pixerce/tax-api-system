@@ -1,8 +1,10 @@
 package com.example.tax.domain.valueobject;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+@EqualsAndHashCode
 @Getter
 public class StoreId {
 
